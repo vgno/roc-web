@@ -3,18 +3,24 @@
 /*eslint-enable */
 
 const devip = require('dev-ip');
-const config = require('config');
-const port = parseInt(config.dev.webpack.hotLoadPort, 10) || 3001;
 
 module.exports = {
-    getDevPath: function getDevPath() {
+    getDevPath: function getDevPath(config) {
         let ip = devip() ? devip()[0] : false;
-        if (config.host) {
+        let port = module.exports.getDevPort();
+
+        if (config && config.host) {
             ip = config.host;
         }
 
         return 'http://' + (ip || 'localhost') + ':' + port;
     },
 
-    port: port
+    getDevPort: function(config) {
+        if (!config || !config.dev || !config.dev.webpack) {
+            return null;
+        }
+        const { hotLoadPort } = config.dev.webpack;
+        return parseInt(hotLoadPort, 10) || 3001;
+    }
 };
