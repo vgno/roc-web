@@ -1,16 +1,6 @@
 import webpack from 'webpack';
 
-//import clearFolder from './utils/clear-folder';
-
-export default function build(webpackConfig) {
-    //clearFolder(webpackConfig.output.path);
-
-    webpack(webpackConfig, function(err, stats) {
-        console.log(err, stats);
-    });
-}
-
-export function startDev(webpackConfig) {
+export default function startDev(webpackConfig) {
     const WebpackDevServer = require('webpack-dev-server');
     const getDevPath = require('./utils/get-dev-path').getDevPath();
     const port = require('./utils/get-dev-path').getDevPort();
@@ -31,3 +21,4 @@ export function startDev(webpackConfig) {
         console.log('The webpack-dev-server is running at ' + getDevPath);
     });
 }
+
