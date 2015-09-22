@@ -1,18 +1,4 @@
-import createWebpackConfig from './webpack/config';
-import runWebpack from './webpack/run';
-import runWebpackDevServer from './webpack/run';
-
-export default {
-    configure: () => {
-        return {
-            createWebpackConfig,
-            runWebpack,
-            runWebpackDevServer
-        };
-    },
-
-    hatch: (incubate = { mode: 'dist' }) => {
-        return {};
-    }
-};
+export createConfig from './webpack/config';
+export build from './webpack/run';
+export startDev from './webpack/run';
 

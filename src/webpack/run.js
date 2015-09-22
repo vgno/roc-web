@@ -2,7 +2,7 @@ import webpack from 'webpack';
 
 //import clearFolder from './utils/clear-folder';
 
-export default function runWebpack(webpackConfig) {
+export default function build(webpackConfig) {
     //clearFolder(webpackConfig.output.path);
 
     webpack(webpackConfig, function(err, stats) {
@@ -10,7 +10,7 @@ export default function runWebpack(webpackConfig) {
     });
 }
 
-export function runWebpackDevServer(webpackConfig) {
+export function startDev(webpackConfig) {
     const WebpackDevServer = require('webpack-dev-server');
     const getDevPath = require('./utils/get-dev-path').getDevPath();
     const port = require('./utils/get-dev-path').getDevPort();

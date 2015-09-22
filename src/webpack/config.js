@@ -15,7 +15,7 @@ const writeStats = require('./utils/write-stats');
 // const getDevPath = require('./utils/get-dev-path').getDevPath();
 //const getDevPath = '';
 
-export default function createWebpackConfig(options) {
+export default function createConfig(options) {
     const allowedModes = ['dev', 'test', 'dist'];
     const allowedTargets = ['node', 'browser'];
     const devPath = options.getDevPath || require('./utils/get-dev-path').getDevPath();
