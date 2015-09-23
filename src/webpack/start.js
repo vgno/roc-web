@@ -8,7 +8,7 @@ export default function startDev(webpackConfig) {
 
     new WebpackDevServer(webpack(webpackConfig), {
         publicPath: webpackConfig.output.publicPath,
-        contentBase: path,
+        contentBase: 'build/',
         noInfo: true,
         headers: {
             'Access-Control-Allow-Origin': '*'

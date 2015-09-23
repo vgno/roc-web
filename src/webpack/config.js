@@ -187,6 +187,9 @@ export default function createConfig(options) {
     * Resolve
     */
     webpackConfig.resolve = {
+        fallback: [
+            path.join(__dirname, '../../node_modules')
+        ],
         extensions: ['', '.js']
     };
 
@@ -211,6 +214,13 @@ export default function createConfig(options) {
                     entryOnly: false
                 }
             )
+        );
+    }
+
+    if (BROWSER) {
+        webpackConfig.plugins.push(
+            new webpack.IgnorePlugin(/^config$/),
+            new webpack.IgnorePlugin(/^\.\/server$/)
         );
     }
 
