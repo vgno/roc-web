@@ -1,24 +1,18 @@
-/*eslint-disable */
-'use strict';
-/*eslint-enable */
+import { getDevPath } from './utils/dev';
+import webpack from 'webpack';
+import path from 'path';
 
-const webpack = require('webpack');
+import autoprefixer from 'autoprefixer';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
+import writeStats from './utils/write-stats';
 
 const bourbon = './node_modules/bourbon/app/assets/stylesheets/';
 const neat = './node_modules/bourbon-neat/app/assets/stylesheets/';
 
-const autoprefixer = require('autoprefixer');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
-
-const writeStats = require('./utils/write-stats');
-// const getDevPath = require('./utils/get-dev-path').getDevPath();
-//const getDevPath = '';
-
 export default function createConfig(options) {
     const allowedModes = ['dev', 'test', 'dist'];
     const allowedTargets = ['node', 'browser'];
-    const devPath = options.getDevPath || require('./utils/get-dev-path').getDevPath();
 
     if (allowedModes.indexOf(options.mode) === -1) {
         throw new Error(`Invalid mode, must be one of ${allowedModes}. Was instead ${options.mode}`);
@@ -28,8 +22,8 @@ export default function createConfig(options) {
         throw new Error(`Invalid target, must be one of ${allowedTargets}. Was instead ${options.target}`);
     }
 
-    if (!options.buildDir) {
-        throw new Error('A build directory needs to be defined in the options.');
+    if (!options.buildPath) {
+        throw new Error('A build path needs to be defined in the options.');
     }
 
     const DEV = (options.mode === 'dev');
@@ -43,10 +37,24 @@ export default function createConfig(options) {
 
     let webpackConfig = {};
 
+    /**
+    * Target
+    */
+    let buildSubdir = 'client';
+
+    if (NODE) {
+        webpackConfig.target = 'node';
+        buildSubdir = 'server';
+    }
+
+    const devPath = getDevPath({
+        buildPath: options.buildPath
+    });
+
+    let completeBuildPath = path.join(options.buildPath.absolute, buildSubdir);
+
     if (NODE) {
         webpackConfig.externals = [
-            {
-            },
             /^[a-zA-Z\-0-9/]+$/
         ];
     }
@@ -66,24 +74,14 @@ export default function createConfig(options) {
     }
 
     /**
-    * Target
-    */
-    let buildSubdir = 'client';
-
-    if (NODE) {
-        webpackConfig.target = 'node';
-        buildSubdir = 'server';
-    }
-
-    /**
     * Output
     */
     if (TEST) {
         webpackConfig.output = {};
     } else {
         webpackConfig.output = {
-            path: options.buildDir.absolute + '/' + buildSubdir,
-            publicPath: DIST ? '/' : devPath + '/' + options.buildDir.relative + '/',
+            path: completeBuildPath,
+            publicPath: DIST ? '/' : devPath,
             filename: (DIST && BROWSER) ? '[name].[hash].js' : '[name].bundle.js',
             chunkFilename: (DIST && BROWSER) ? '[name].[hash].js' : '[name].bundle.js'
         };
@@ -192,6 +190,13 @@ export default function createConfig(options) {
         extensions: ['', '.js']
     };
 
+    webpackConfig.resolveLoader = {
+        root: [
+            path.join(completeBuildPath, '../../node_modules'),
+            path.join(__dirname, '../../node_modules')
+        ]
+    };
+
     /**
     * Plugins
     */
@@ -272,17 +277,5 @@ export default function createConfig(options) {
         );
     }
 
-    if (options.resolveLoader.root) {
-        webpackConfig.resolveLoader = {
-            root: options.resolveLoader.root
-        };
-    }
-
-    /*if (options.resolve.root) {
-        webpackConfig.resolve = {
-            root: options.resolve.root
-        };
-    }*/
-
     return webpackConfig;
-};
+}

@@ -1,13 +1,14 @@
 import webpack from 'webpack';
+import WebpackDevServer from 'webpack-dev-server';
+import { getDevPath, getDevPort } from './utils/dev';
 
 export default function startDev(webpackConfig) {
-    const WebpackDevServer = require('webpack-dev-server');
-    const getDevPath = require('./utils/get-dev-path').getDevPath();
-    const port = require('./utils/get-dev-path').getDevPort();
+    const path = getDevPath();
+    const port = getDevPort();
 
     new WebpackDevServer(webpack(webpackConfig), {
         publicPath: webpackConfig.output.publicPath,
-        contentBase: getDevPath,
+        contentBase: path,
         noInfo: true,
         headers: {
             'Access-Control-Allow-Origin': '*'
@@ -18,7 +19,7 @@ export default function startDev(webpackConfig) {
             console.log(err);
         }
 
-        console.log('The webpack-dev-server is running at ' + getDevPath);
+        console.log('The webpack-dev-server is running at ' + path);
     });
 }
 
