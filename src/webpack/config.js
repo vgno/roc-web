@@ -219,8 +219,8 @@ export default function createConfig(options) {
 
     if (BROWSER) {
         webpackConfig.plugins.push(
-            new webpack.IgnorePlugin(/^config$/),
-            new webpack.IgnorePlugin(/^\.\/server$/)
+            new webpack.IgnorePlugin(/^config$/)
+            //new webpack.IgnorePlugin(/^\.\/server$/)
         );
     }
 
