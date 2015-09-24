@@ -190,7 +190,7 @@ export default function createConfig(options) {
         fallback: [
             path.join(__dirname, '../../node_modules')
         ],
-        extensions: ['', '.js']
+        extensions: ['', '.js', '.css', '.scss']
     };
 
     webpackConfig.resolveLoader = {
