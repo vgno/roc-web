@@ -1,21 +1,16 @@
-/*eslint-disable */
-'use strict';
-/*eslint-enable */
+import { getDevPath } from './utils/dev';
+import webpack from 'webpack';
+import path from 'path';
 
-const webpack = require('webpack');
+import autoprefixer from 'autoprefixer';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
+import writeStats from './utils/write-stats';
 
 const bourbon = './node_modules/bourbon/app/assets/stylesheets/';
 const neat = './node_modules/bourbon-neat/app/assets/stylesheets/';
 
-const autoprefixer = require('autoprefixer');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
-
-const writeStats = require('./utils/write-stats');
-// const getDevPath = require('./utils/get-dev-path').getDevPath();
-const getDevPath = '';
-
-module.exports = function createWebpackConfig(options) {
+export default function createConfig(options) {
     const allowedModes = ['dev', 'test', 'dist'];
     const allowedTargets = ['node', 'browser'];
 
@@ -24,11 +19,11 @@ module.exports = function createWebpackConfig(options) {
     }
 
     if (allowedTargets.indexOf(options.target) === -1) {
-        throw new Error(`Invalid mode, must be one of ${allowedTargets}. Was instead ${options.target}`);
+        throw new Error(`Invalid target, must be one of ${allowedTargets}. Was instead ${options.target}`);
     }
 
-    if (!options.buildDir) {
-        throw new Error('A build directory needs to be defined in the options.');
+    if (!options.buildPath) {
+        throw new Error('A build path needs to be defined in the options.');
     }
 
     const DEV = (options.mode === 'dev');
@@ -42,8 +37,26 @@ module.exports = function createWebpackConfig(options) {
 
     let webpackConfig = {};
 
+    /**
+    * Target
+    */
+    let buildSubdir = 'client';
+
     if (NODE) {
-        webpackConfig.externals = /^[a-zA-Z\-0-9/]+$/;
+        webpackConfig.target = 'node';
+        buildSubdir = 'server';
+    }
+
+    const devPath = getDevPath({
+        buildPath: options.buildPath
+    });
+
+    let completeBuildPath = path.join(options.buildPath.absolute, buildSubdir);
+
+    if (NODE) {
+        webpackConfig.externals = [
+            /^[a-zA-Z\-0-9/]+$/
+        ];
     }
 
     /**
@@ -61,21 +74,14 @@ module.exports = function createWebpackConfig(options) {
     }
 
     /**
-    * Target
-    */
-    if (NODE) {
-        webpackConfig.target = 'node';
-    }
-
-    /**
     * Output
     */
     if (TEST) {
         webpackConfig.output = {};
     } else {
         webpackConfig.output = {
-            path: options.buildDir.absolute,
-            publicPath: DIST ? '/' : getDevPath + '/' + options.buildDir.relative + '/',
+            path: completeBuildPath,
+            publicPath: DIST ? '/' : devPath,
             filename: (DIST && BROWSER) ? '[name].[hash].js' : '[name].bundle.js',
             chunkFilename: (DIST && BROWSER) ? '[name].[hash].js' : '[name].bundle.js'
         };
@@ -99,7 +105,7 @@ module.exports = function createWebpackConfig(options) {
     if (TEST) {
         webpackConfig.module.loaders.push({
             test: /\.js$/,
-            loader: 'babel',
+            loader: 'babel-loader',
             // FIXME
             include: [
                 /tests/,
@@ -108,7 +114,7 @@ module.exports = function createWebpackConfig(options) {
         });
         webpackConfig.module.preLoaders.push({
             test: /\.js$/,
-            loader: 'isparta',
+            loader: 'isparta-loader',
             // FIXME
             exclude: [
                 /node_modules/,
@@ -122,7 +128,7 @@ module.exports = function createWebpackConfig(options) {
     // JS LOADER
     const jsLoader = {
         test: /\.js$/,
-        loader: 'babel',
+        loader: 'babel-loader',
         // FIXME
         exclude: [
             /node_modules/,
@@ -169,31 +175,63 @@ module.exports = function createWebpackConfig(options) {
     // FILE LOADERS
     webpackConfig.module.loaders.push({
         test: /\.(png|svg)$/,
-        loader: 'url?limit=100000'
+        loader: 'url-loader?limit=100000'
     });
 
     webpackConfig.module.loaders.push({
         test: /\.(jpg)$/,
-        loader: 'file'
+        loader: 'file-loader'
     });
 
     /**
     * Resolve
     */
     webpackConfig.resolve = {
+        fallback: [
+            path.join(__dirname, '../../node_modules')
+        ],
         extensions: ['', '.js']
+    };
+
+    webpackConfig.resolveLoader = {
+        root: [
+            path.join(completeBuildPath, '../../node_modules'),
+            path.join(__dirname, '../../node_modules')
+        ]
     };
 
     /**
     * Plugins
     */
-    webpackConfig.plugins = [
+    webpackConfig.plugins = [];
 
+    if (NODE) {
+        webpackConfig.plugins.push(
+            new webpack.BannerPlugin(
+                'require("source-map-support").install();',
+                {
+                    raw: true,
+                    entryOnly: false
+                }
+            )
+        );
+    }
+
+    if (BROWSER) {
+        webpackConfig.plugins.push(
+            new webpack.IgnorePlugin(/^config$/)
+            //new webpack.IgnorePlugin(/^\.\/server$/)
+        );
+    }
+
+    webpackConfig.plugins.push(
         new ExtractTextPlugin('[name].[hash].css', {
             disable: BROWSER && DEV
-        }),
+        })
+    );
 
-        // process.env.NODE_ENV is used by React and some other libs to determin what to run
+    webpackConfig.plugins.push(
+        // process.env.NODE_ENV is used by React and some other libs to determine what to run
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(ENV),
             '__DEV__': DEV,
@@ -201,7 +239,7 @@ module.exports = function createWebpackConfig(options) {
             '__DIST__': DIST,
             '__SERVER__': NODE
         })
-    ];
+    );
 
     if (DIST) {
         webpackConfig.plugins.push(function() {
@@ -236,18 +274,6 @@ module.exports = function createWebpackConfig(options) {
         );
     }
 
-    if (NODE && false) {
-        webpackConfig.plugins.push(
-            new webpack.BannerPlugin(
-                'require("source-map-support").install();',
-                {
-                    raw: true,
-                    entryOnly: false
-                }
-            )
-        );
-    }
-
     // FIXME
     if (BROWSER && DEV && !TEST) {
         webpackConfig.plugins.push(
@@ -261,15 +287,5 @@ module.exports = function createWebpackConfig(options) {
         );
     }
 
-    /*
-    FIXME
-
-    webpackConfig.resolveLoader = { root: [
-        ...
-    ] };
-    webpackConfig.resolve = { fallback: [
-        ...
-    ] };
-    */
     return webpackConfig;
-};
+}
