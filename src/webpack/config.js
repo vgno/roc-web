@@ -145,6 +145,12 @@ export default function createConfig(options) {
         test: /\.scss$/
     };
 
+    // JSON LOADER
+    const jsonLoader = {
+        test: /\.json$/,
+        loader: 'json-loader'
+    };
+
     let styleLoaders = 'css?sourceMap&module&importLoaders=1&localIdentName=';
 
     // Define how the class names should be defined
@@ -182,6 +188,10 @@ export default function createConfig(options) {
         test: /\.(jpg)$/,
         loader: 'file-loader'
     });
+
+    if (NODE) {
+        webpackConfig.module.loaders.push(jsonLoader);
+    }
 
     /**
     * Resolve

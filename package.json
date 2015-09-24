@@ -32,6 +32,7 @@
     "dev-ip": "~1.0.1",
     "extract-text-webpack-plugin": "~0.8.2",
     "file-loader": "~0.8.4",
+    "json-loader": "^0.5.3",
     "node-sass": "~3.3.2",
     "postcss-loader": "~0.6.0",
     "sass-loader": "~2.0.1",
