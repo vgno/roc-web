@@ -287,5 +287,8 @@ export default function createConfig(options) {
         );
     }
 
-    return webpackConfig;
+    return {
+        webpackConfig,
+        webpack
+    };
 }
