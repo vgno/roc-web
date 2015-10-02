@@ -1,1 +1,1 @@
-export default from '../webpack/config';
+export default from '../webpack/create-builder';
