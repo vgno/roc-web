@@ -1,5 +1,3 @@
-export createConfig from './api/create-config';
+export createBuilder from './api/create-builder';
 export createServer from './api/create-server';
 export startServer from './api/start-server';
-export build from './api/build';
-
