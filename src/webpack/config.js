@@ -91,6 +91,10 @@ export default function createConfig(options) {
         webpackConfig.output.libraryTarget = 'commonjs2';
     }
 
+    if (BROWSER && DEV) {
+        webpackConfig.output.filename = '[name].client.bundle.js';
+    }
+
     /**
     * Loaders
     */
@@ -259,7 +263,9 @@ export default function createConfig(options) {
 
     if (DEV && BROWSER) {
         webpackConfig.plugins.push(
-            new webpack.HotModuleReplacementPlugin()
+            new webpack.optimize.OccurenceOrderPlugin(),
+            new webpack.HotModuleReplacementPlugin(),
+            new webpack.NoErrorsPlugin()
         );
     }
 

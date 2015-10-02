@@ -12,8 +12,12 @@ describe('Module index', () => {
             expect(api.build).to.be.a('function');
         });
 
-        it('must expose startDev as a function', () => {
-            expect(api.startDev).to.be.a('function');
+        it('must expose createServer as a function', () => {
+            expect(api.createServer).to.be.a('function');
+        });
+
+        it('must expose startServer as a function', () => {
+            expect(api.startServer).to.be.a('function');
         });
     });
 });

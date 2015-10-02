@@ -1,4 +1,5 @@
-export createWebpackConfig from './api/create-config';
+export createConfig from './api/create-config';
+export createServer from './api/create-server';
+export startServer from './api/start-server';
 export build from './api/build';
-export startDev from './api/start-dev';
 
