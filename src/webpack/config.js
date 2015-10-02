@@ -10,52 +10,49 @@ import writeStats from './utils/write-stats';
 const bourbon = './node_modules/bourbon/app/assets/stylesheets/';
 const neat = './node_modules/bourbon-neat/app/assets/stylesheets/';
 
-export default function createConfig(options) {
+export default function createBuilder(options) {
     const allowedModes = ['dev', 'test', 'dist'];
-    const allowedTargets = ['node', 'browser'];
+    const allowedTargets = ['server', 'client'];
 
     if (allowedModes.indexOf(options.mode) === -1) {
-        throw new Error(`Invalid mode, must be one of ${allowedModes}. Was instead ${options.mode}`);
+        throw new Error(`Invalid mode, must be one of ${allowedModes}. Was instead ${options.mode}.`);
     }
 
     if (allowedTargets.indexOf(options.target) === -1) {
-        throw new Error(`Invalid target, must be one of ${allowedTargets}. Was instead ${options.target}`);
+        throw new Error(`Invalid target, must be one of ${allowedTargets}. Was instead ${options.target}.`);
     }
 
-    if (!options.buildPath) {
-        throw new Error('A build path needs to be defined in the options.');
+    if (!options.outputPath) {
+        throw new Error('A output path needs to be defined in the options.');
     }
 
     const DEV = (options.mode === 'dev');
     const TEST = (options.mode === 'test');
     const DIST = (options.mode === 'dist');
 
-    const NODE = (options.target === 'node');
-    const BROWSER = (options.target === 'browser');
+    const SERVER = (options.target === 'server');
+    const CLIENT = (options.target === 'client');
 
     const ENV = DIST ? 'production' : 'development';
 
     let webpackConfig = {};
 
+    webpackConfig.bail = true;
+
     /**
     * Target
     */
-    let buildSubdir = 'client';
-
-    if (NODE) {
+    if (SERVER) {
         webpackConfig.target = 'node';
-        buildSubdir = 'server';
     }
 
     const devPath = getDevPath({
-        buildPath: options.buildPath
+        buildPath: options.outputPath
     });
 
-    let completeBuildPath = path.join(options.buildPath.absolute, buildSubdir);
-
-    if (NODE) {
+    if (SERVER) {
         webpackConfig.externals = [
-            /^[a-zA-Z\-0-9/]+$/
+            /^[a-zA-Z\-0-9]{1}.*$/
         ];
     }
 
@@ -65,9 +62,9 @@ export default function createConfig(options) {
     * TODO: Consider tweaking this option & handle production correct
     * We want the source map files to be stored on a seperate server.
     */
-    if (BROWSER && DEV) {
+    if (CLIENT && DEV) {
         webpackConfig.devtool = 'cheap-module-inline-source-map';
-    } else if (BROWSER && TEST) {
+    } else if (CLIENT && TEST) {
         webpackConfig.devtool = 'inline-source-map';
     } else {
         webpackConfig.devtool = 'source-map';
@@ -80,18 +77,18 @@ export default function createConfig(options) {
         webpackConfig.output = {};
     } else {
         webpackConfig.output = {
-            path: completeBuildPath,
+            path: options.outputPath.absolute,
             publicPath: DIST ? '/' : devPath,
-            filename: (DIST && BROWSER) ? '[name].[hash].js' : '[name].bundle.js',
-            chunkFilename: (DIST && BROWSER) ? '[name].[hash].js' : '[name].bundle.js'
+            filename: (DIST && CLIENT) ? '[name].[hash].js' : '[name].bundle.js',
+            chunkFilename: (DIST && CLIENT) ? '[name].[hash].js' : '[name].bundle.js'
         };
     }
 
-    if (NODE) {
+    if (SERVER) {
         webpackConfig.output.libraryTarget = 'commonjs2';
     }
 
-    if (BROWSER && DEV) {
+    if (CLIENT && DEV) {
         webpackConfig.output.filename = '[name].client.bundle.js';
     }
 
@@ -193,7 +190,7 @@ export default function createConfig(options) {
         loader: 'file-loader'
     });
 
-    if (NODE) {
+    if (SERVER) {
         webpackConfig.module.loaders.push(jsonLoader);
     }
 
@@ -209,7 +206,7 @@ export default function createConfig(options) {
 
     webpackConfig.resolveLoader = {
         root: [
-            path.join(completeBuildPath, '../../node_modules'),
+            path.join(process.cwd(), 'node_modules'),
             path.join(__dirname, '../../node_modules')
         ]
     };
@@ -219,7 +216,7 @@ export default function createConfig(options) {
     */
     webpackConfig.plugins = [];
 
-    if (NODE) {
+    if (SERVER) {
         webpackConfig.plugins.push(
             new webpack.BannerPlugin(
                 'require("source-map-support").install();',
@@ -231,7 +228,7 @@ export default function createConfig(options) {
         );
     }
 
-    if (BROWSER) {
+    if (CLIENT) {
         webpackConfig.plugins.push(
             new webpack.IgnorePlugin(/^config$/)
             //new webpack.IgnorePlugin(/^\.\/server$/)
@@ -240,7 +237,7 @@ export default function createConfig(options) {
 
     webpackConfig.plugins.push(
         new ExtractTextPlugin('[name].[hash].css', {
-            disable: BROWSER && DEV
+            disable: CLIENT && DEV
         })
     );
 
@@ -251,7 +248,7 @@ export default function createConfig(options) {
             '__DEV__': DEV,
             '__TEST__': TEST,
             '__DIST__': DIST,
-            '__SERVER__': NODE
+            '__SERVER__': SERVER
         })
     );
 
@@ -261,7 +258,7 @@ export default function createConfig(options) {
         });
     }
 
-    if (DEV && BROWSER) {
+    if (DEV && CLIENT) {
         webpackConfig.plugins.push(
             new webpack.optimize.OccurenceOrderPlugin(),
             new webpack.HotModuleReplacementPlugin(),
@@ -276,7 +273,7 @@ export default function createConfig(options) {
         );
     }
 
-    if (DIST && BROWSER) {
+    if (DIST && CLIENT) {
         webpackConfig.plugins.push(
             new webpack.optimize.UglifyJsPlugin({
                 /* eslint-disable */
@@ -291,7 +288,7 @@ export default function createConfig(options) {
     }
 
     // FIXME
-    if (BROWSER && DEV && !TEST) {
+    if (CLIENT && DEV && !TEST) {
         webpackConfig.plugins.push(
             new BrowserSyncPlugin({
                 host: 'localhost',
