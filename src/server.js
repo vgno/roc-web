@@ -16,8 +16,8 @@ export default function createServer(options = {}) {
     server.use(serve('./static'));
 
     if (options.path) {
-        const paths = (Array.isArray(options.path) ? options.path : [options.path]);
-        for (let path of paths) {
+        const paths = [].concat(options.path);
+        for (const path of paths) {
             server.use(serve(path));
         }
     }
