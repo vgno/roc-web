@@ -2,7 +2,6 @@ import debug from 'debug';
 import koa from 'koa';
 import helmet from 'koa-helmet';
 import serve from 'koa-static';
-import path from 'path';
 
 export default function createServer(options = {}) {
     const server = koa();
@@ -16,10 +15,11 @@ export default function createServer(options = {}) {
 
     server.use(serve('./static'));
 
-    if (!options.path) {
-        server.use(serve(path.join(__dirname, './views')));
-    } else {
-        server.use(serve(options.path));
+    if (options.path) {
+        const paths = (Array.isArray(options.path) ? options.path : [options.path]);
+        for (let path of paths) {
+            server.use(serve(path));
+        }
     }
 
     return server;
