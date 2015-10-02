@@ -23,7 +23,7 @@ export default function createBuilder(options) {
     }
 
     if (!options.outputPath) {
-        throw new Error('A build path needs to be defined in the options.');
+        throw new Error('A output path needs to be defined in the options.');
     }
 
     const DEV = (options.mode === 'dev');
