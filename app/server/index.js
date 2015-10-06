@@ -3,7 +3,7 @@ import koa from 'koa';
 import helmet from 'koa-helmet';
 import serve from 'koa-static';
 
-export default function createServer(options = {}) {
+export function createServer(options = {}) {
     const server = koa();
 
     // Security headers
@@ -30,4 +30,3 @@ export function startServer(server, port = 3000) {
     server.listen(port);
     debug('app')(`Server started on port ${port}`);
 }
-
