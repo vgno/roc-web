@@ -291,6 +291,7 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
             '__TEST__': TEST,
             '__DIST__': DIST,
             '__SERVER__': SERVER,
+            '__CLIENT__': CLIENT,
             'ROC_SERVER_ENTRY': JSON.stringify(options.entry),
             'ROC_PATH_RESOLVER': JSON.stringify(resolver)
         })
@@ -336,8 +337,11 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         webpackConfig.plugins.push(
             new BrowserSyncPlugin({
                 host: 'localhost',
-                port: 3000,
-                logFileChanges: false
+                port: 3002,
+                logFileChanges: false,
+                ui: {
+                    port:3003
+                }
             }, {
                 reload: false
             })
