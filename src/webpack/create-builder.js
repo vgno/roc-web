@@ -1,3 +1,4 @@
+import 'babel/polyfill';
 import { getDevPath } from './utils/dev';
 import webpack from 'webpack';
 import path from 'path';
@@ -343,8 +344,10 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         );
     }
 
-    return {
-        webpackConfig,
-        webpack
+    const builder = {
+        config: webpackConfig,
+        build: webpack
     };
+
+    return builder;
 }

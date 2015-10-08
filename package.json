@@ -45,6 +45,7 @@
     "koa-webpack-dev-middleware": "~1.0.1",
     "koa-webpack-hot-middleware": "~1.0.1",
     "node-sass": "~3.3.2",
+    "nodemon": "~1.7.1",
     "postcss-loader": "~0.6.0",
     "sass-loader": "~2.0.1",
     "source-map-support": "~0.3.2",
