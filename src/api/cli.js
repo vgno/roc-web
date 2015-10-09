@@ -23,7 +23,20 @@ export function watchServer(compiler) {
                 reject(serverErr);
             }
 
+            if (!compiler) {
+                return reject(new Error('A compiler instance must be defined in order to start watch!'));
+            }
+
             const statsJson = serverStats.toJson();
+
+            if (statsJson.errors.length > 0) {
+                statsJson.errors.map(err => console.log(err));
+            }
+
+            if (statsJson.warnings.length > 0) {
+                statsJson.warnings.map(wrn => console.log(wrn));
+            }
+
             let bundleName = 'app.server.bundle.js';
 
             if (statsJson.assets && statsJson.assets.length > 0) {
