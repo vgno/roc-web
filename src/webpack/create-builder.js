@@ -244,9 +244,7 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         loader: 'file-loader'
     });
 
-    if (SERVER) {
-        webpackConfig.module.loaders.push(jsonLoader);
-    }
+    webpackConfig.module.loaders.push(jsonLoader);
 
     /**
     * Resolve
