@@ -35,6 +35,8 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
     const SERVER = (options.target === 'server');
     const CLIENT = (options.target === 'client');
 
+    const COMPONENT_BUILD = !!options.componentBuild;
+
     const ENV = DIST ? 'production' : 'development';
 
     let webpackConfig = {};
@@ -290,7 +292,8 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
             '__SERVER__': SERVER,
             '__CLIENT__': CLIENT,
             'ROC_SERVER_ENTRY': JSON.stringify(options.entry),
-            'ROC_PATH_RESOLVER': JSON.stringify(resolver)
+            'ROC_PATH_RESOLVER': JSON.stringify(resolver),
+            'COMPONENT_BUILD': COMPONENT_BUILD
         })
     );
 
@@ -343,6 +346,10 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
                 reload: false
             })
         );
+    }
+
+    if (COMPONENT_BUILD) {
+        webpackConfig.output.libraryTarget = 'umd';
     }
 
     return {

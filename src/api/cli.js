@@ -1,14 +1,33 @@
 import path from 'path';
 import nodemon from 'nodemon';
 
-let devServer = null;
-const serve = (bundlePath) => {
-    return () => {
-        devServer = nodemon({
-            script: bundlePath
-        });
+const initNodemon = () => {
+    let once = false;
+    return (bundlePath) => {
+        if (!once) {
+            once = true;
+            nodemon({
+                ext: 'js json',
+                watch: [
+                    'config/',
+                    bundlePath
+                ]
+            });
+
+            nodemon.on('start', () => {
+                console.log('Nodemon: Server has started');
+            }).on('quit', () => {
+                console.log('Nodemon: Server has been terminated');
+            }).on('restart', (files) => {
+                return files ?
+                    console.log('Nodemon: Server restarted due to: ', files) :
+                    console.log('Nodemon: Server restared due to user input [rs]');
+            });
+        }
     };
 };
+
+const startNodemon = initNodemon();
 
 export function start(artifact) {
     require(artifact);
@@ -20,7 +39,7 @@ export function watchServer(compiler) {
             poll: false
         }, (serverErr, serverStats) => {
             if (serverErr) {
-                reject(serverErr);
+                return reject(serverErr);
             }
 
             if (!compiler) {
@@ -45,17 +64,9 @@ export function watchServer(compiler) {
 
             const artifact = path.join(compiler.outputPath, '/', bundleName);
 
-            if (devServer) {
-                // queue restart
-                devServer
-                    .on('quit', serve(artifact))
-                    .emit('quit');
-                resolve();
-                return;
-            }
             // start first time
-            serve(artifact)();
-            resolve();
+            startNodemon(artifact);
+            return resolve();
         });
     });
 }
