@@ -20,7 +20,7 @@ export function watchServer(compiler) {
             poll: false
         }, (serverErr, serverStats) => {
             if (serverErr) {
-                reject(serverErr);
+                return reject(serverErr);
             }
 
             if (!compiler) {
@@ -48,10 +48,9 @@ export function watchServer(compiler) {
             if (devServer) {
                 // queue restart
                 devServer
-                    .on('quit', serve(artifact))
+                    .once('quit', serve(artifact))
                     .emit('quit');
-                resolve();
-                return;
+                return resolve();
             }
             // start first time
             serve(artifact)();
