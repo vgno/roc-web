@@ -350,6 +350,7 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
 
     if (COMPONENT_BUILD) {
         webpackConfig.output.libraryTarget = 'umd';
+        webpackConfig.output.filename = '[name].component.js';
     }
 
     return {
