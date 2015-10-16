@@ -319,7 +319,7 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         );
     }
 
-    if (false && DIST && CLIENT) {
+    if (DIST && CLIENT) {
         webpackConfig.plugins.push(
             new webpack.optimize.UglifyJsPlugin({
                 /* eslint-disable */
