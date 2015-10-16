@@ -8,6 +8,7 @@ const initNodemon = () => {
             once = true;
             nodemon({
                 ext: 'js json',
+                script: bundlePath,
                 watch: [
                     'config/',
                     bundlePath
@@ -26,7 +27,6 @@ const initNodemon = () => {
         }
     };
 };
-
 const startNodemon = initNodemon();
 
 export function start(artifact) {

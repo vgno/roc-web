@@ -276,8 +276,10 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         );
     }
 
+    const styleName = COMPONENT_BUILD ? '[name].component.css' : '[name].[hash].css';
+
     webpackConfig.plugins.push(
-        new ExtractTextPlugin('[name].[hash].css', {
+        new ExtractTextPlugin(styleName, {
             disable: CLIENT && DEV
         })
     );
@@ -292,8 +294,7 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
             '__SERVER__': SERVER,
             '__CLIENT__': CLIENT,
             'ROC_SERVER_ENTRY': JSON.stringify(options.entry),
-            'ROC_PATH_RESOLVER': JSON.stringify(resolver),
-            'COMPONENT_BUILD': COMPONENT_BUILD
+            'ROC_PATH_RESOLVER': JSON.stringify(resolver)
         })
     );
 
@@ -340,7 +341,7 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
                 port: 3002,
                 logFileChanges: false,
                 ui: {
-                    port:3003
+                    port: 3003
                 }
             }, {
                 reload: false
@@ -351,6 +352,18 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
     if (COMPONENT_BUILD) {
         webpackConfig.output.libraryTarget = 'umd';
         webpackConfig.output.filename = '[name].component.js';
+        webpackConfig.entry = {
+            app: [
+                require.resolve('../../component/entry')
+            ]
+        };
+
+        webpackConfig.plugins.push(
+            new webpack.DefinePlugin({
+                COMPONENT_ENTRY: JSON.stringify(options.component),
+                COMPONENT_STYLE: JSON.stringify(options.componentStyle)
+            })
+        );
     }
 
     return {
