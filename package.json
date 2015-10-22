@@ -28,6 +28,7 @@
     "bourbon-neat": "~1.7.2",
     "browser-sync": "2.9.11",
     "browser-sync-webpack-plugin": "~1.0.0",
+    "config": "~1.16.0",
     "css-loader": "~0.19.0",
     "dev-ip": "~1.0.1",
     "extract-text-webpack-plugin": "~0.8.2",

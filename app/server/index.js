@@ -26,7 +26,6 @@ export function createServer(options = {}) {
 }
 
 export function startServer(server, port = 3000) {
-    debug.enable('app');
     server.listen(port);
-    debug('app')(`Server started on port ${port}`);
+    debug('roc')(`Server started on port ${port}`);
 }
