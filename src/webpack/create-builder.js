@@ -41,7 +41,9 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
 
     let webpackConfig = {};
 
-    webpackConfig.bail = true;
+    if (DIST) {
+        webpackConfig.bail = true;
+    }
 
     /**
     * Entry
@@ -308,6 +310,12 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         webpackConfig.plugins.push(
             new webpack.optimize.OccurenceOrderPlugin(),
             new webpack.HotModuleReplacementPlugin(),
+            new webpack.NoErrorsPlugin()
+        );
+    }
+
+    if (DEV && SERVER) {
+        webpackConfig.plugins.push(
             new webpack.NoErrorsPlugin()
         );
     }
