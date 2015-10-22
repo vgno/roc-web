@@ -18,5 +18,11 @@ require('module').Module._initPaths();
 // Get source map source map support
 require('source-map-support').install();
 
+const config = require('config');
+
+if (config.debug && config.debug.server) {
+    require('debug').enable(config.debug.server);
+}
+
 // Start the real entry point
 require(ROC_SERVER_ENTRY);
