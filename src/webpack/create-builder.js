@@ -186,6 +186,24 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
     };
 
     if (!TEST) {
+        if (CLIENT && DEV) {
+			jsLoader.query = {
+				"plugins": ["react-transform"],
+				"extra": {
+					"react-transform": {
+						"transforms": [{
+							"transform": "react-transform-hmr",
+							"imports": ["react"],
+							"locals": ["module"]
+						}, {
+							"transform": "react-transform-catch-errors",
+							"imports": ["react", "redbox-react"]
+						}]
+					}
+				}
+			};
+        }
+
         webpackConfig.module.loaders.push(jsLoader);
     }
 
