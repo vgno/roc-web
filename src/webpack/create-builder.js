@@ -177,7 +177,7 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
                 matches.push({ roc: match[0], next: match[1] });
             }
             const last = matches[matches.length - 1];
-            if (last.next !== 'node_modules') {
+            if (last && last.next !== 'node_modules') {
                 // We want to process this with babel-loader
                 return true;
             }
