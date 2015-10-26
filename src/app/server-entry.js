@@ -15,14 +15,16 @@ process.env.NODE_PATH += `:${getResolvePath()}`;
 require('module').Module._initPaths();
 /* eslint-enable */
 
-// Get source map source map support
+// Get source map support
 require('source-map-support').install();
 
-const config = require('config');
+// Disable warnings from missing config in a application
+process.env.SUPPRESS_NO_CONFIG_WARNING = true;
 
-if (config.debug && config.debug.server) {
-    require('debug').enable(config.debug.server);
-}
+const config = require('roc-web/lib/helpers/get-config');
+
+// Enable debug based on roc.config.js settings
+require('debug').enable(config.debug.server);
 
 // Start the real entry point
 require(ROC_SERVER_ENTRY);

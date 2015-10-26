@@ -1,39 +1,48 @@
+import 'source-map-support/register';
+
 import path from 'path';
 import nodemon from 'nodemon';
+import debug from 'debug';
 
-const initNodemon = () => {
+import config from '../helpers/get-config';
+
+debug.enable(config.dev.debug);
+
+/**
+ * Server watcher.
+ *
+ * Will restart the server when detecting a change in the application bundle along with what is configured in
+ * 'roc.config.js'.
+ *
+ * @param {object} compiler - a Webpack compiler instance
+ * @returns {Promise} Resolves after it has completed.
+ */
+export default function watchServer(compiler) {
+    const nodemonLogger = debug('roc:dev:server:nodemon');
+    const watcherLogger = debug('roc:dev:server:watcher');
+
     let once = false;
-    return (bundlePath) => {
+    const startNodemon = (bundlePath) => {
         if (!once) {
             once = true;
             nodemon({
                 ext: 'js json',
                 script: bundlePath,
-                watch: [
-                    'config/',
-                    bundlePath
-                ]
+                watch: [bundlePath].concat(config.dev.watch)
             });
 
             nodemon.on('start', () => {
-                console.log('Nodemon: Server has started');
+                nodemonLogger('Server has started');
             }).on('quit', () => {
-                console.log('Nodemon: Server has been terminated');
+                nodemonLogger('Server has been terminated');
             }).on('restart', (files) => {
                 return files ?
-                    console.log('Nodemon: Server restarted due to: ', files) :
-                    console.log('Nodemon: Server restared due to user input [rs]');
+                    nodemonLogger('Server restarted due to: ', files) :
+                    nodemonLogger('Server restared due to user input [rs]');
             });
         }
     };
-};
-const startNodemon = initNodemon();
 
-export function start(artifact) {
-    require(artifact);
-}
-
-export function watchServer(compiler) {
     return new Promise((resolve, reject) => {
         compiler.watch({
             poll: false
@@ -47,6 +56,7 @@ export function watchServer(compiler) {
             }
 
             const statsJson = serverStats.toJson();
+            watcherLogger(`Server rebuilt ${statsJson.time} ms`);
 
             if (statsJson.errors.length > 0) {
                 statsJson.errors.map(err => console.log(err));
@@ -69,8 +79,4 @@ export function watchServer(compiler) {
             return resolve();
         });
     });
-}
-
-export function watchClient() {
-    return new Promise(resolve => resolve());
 }

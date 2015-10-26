@@ -1,18 +1,27 @@
-import { getDevPath } from './utils/dev';
+import 'source-map-support/register';
+
 import webpack from 'webpack';
 import path from 'path';
-
 import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
+
+import { getDevPath, getDevPort } from '../helpers/dev';
 import writeStats from './utils/write-stats';
+import config from './../helpers/get-config';
 
 const bourbon = './node_modules/bourbon/app/assets/stylesheets/';
 const neat = './node_modules/bourbon-neat/app/assets/stylesheets/';
 
-/* resolver: should be a path to a file that will return the final new NODE_PATH
- */
-export default function createBuilder(options, resolver = 'roc-web/lib/get-resolve-path') {
+/**
+  * Creates a builder.
+  *
+  * @param {!rocBuildConfig} options - Options for the builder.
+  * @param {!string} [resolver=roc-web/lib/helpers/get-resolve-path] - Path to the resolver for the server side
+  * {@link getResolvePath}.
+  * @returns {rocBuilder}
+  */
+export default function createBuilder(options, resolver = 'roc-web/lib/helpers/get-resolve-path') {
     const allowedModes = ['dev', 'test', 'dist'];
     const allowedTargets = ['server', 'client'];
 
@@ -51,7 +60,22 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
     if (SERVER) {
         webpackConfig.entry = {
             app: [
-                require.resolve('../../app/server-entry')
+                require.resolve('../../src/app/server-entry')
+            ]
+        };
+    } else if (TEST) {
+        webpackConfig.entry = {};
+    } else if (CLIENT && DEV) {
+        webpackConfig.entry = {
+            app: [
+                `webpack-hot-middleware/client?path=${getDevPath(options.devPort)}__webpack_hmr`,
+                options.entry
+            ]
+        };
+    } else if (CLIENT) {
+        webpackConfig.entry = {
+            app: [
+                options.entry
             ]
         };
     }
@@ -63,14 +87,13 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         webpackConfig.target = 'node';
     }
 
-    const devPath = getDevPath({
-        buildPath: options.outputPath
-    });
+    const devPath = getDevPath(options.devPort, options.outputPath.relative);
 
     if (SERVER) {
         webpackConfig.externals = [
             {
-                [resolver]: true
+                [resolver]: true,
+                ['roc-web/lib/helpers/get-config']: true
             },
             function(context, request, callback) {
                 // If a roc module include it in the bundle
@@ -92,7 +115,8 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
     /**
     * Devtool
     *
-    * TODO: Consider tweaking this option & handle production correct
+    * TODO
+    * Consider tweaking this option & handle production correct
     * We want the source map files to be stored on a seperate server.
     */
     if (CLIENT && DEV) {
@@ -341,18 +365,38 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         );
     }
 
-    // FIXME
-    if (CLIENT && DEV && !TEST) {
+    const getPort = port => port || process.env.PORT || config.port;
+
+    if (SERVER && DEV && !TEST) {
+        // The logic here is to make sure we don't override options set by something else
+        // We merge if the debug option has changed since we touched it last otherwise we jsut use the new value
+        const debugOptions = `<script>
+            if (localStorage.debugTemp === localStorage.debug) {
+                localStorage.debug = '${config.dev.debug}';
+            } else {
+                localStorage.debug = localStorage.debug + ',${config.dev.debug}';
+            }
+            localStorage.debugTemp = localStorage.debug;
+        </script>`;
+
         webpackConfig.plugins.push(
             new BrowserSyncPlugin({
-                host: 'localhost',
-                port: 3002,
-                logFileChanges: false,
+                port: getDevPort(options.devPort) + 1,
+                proxy: `0.0.0.0:${getPort(options.port)}`,
+                snippetOptions: {
+                    rule: {
+                        match: /<\/body>/i,
+                        fn: (snippet, match) => {
+                            return debugOptions + snippet + match;
+                        }
+                    }
+                },
+                open: false,
                 ui: {
-                    port: 3003
+                    port: getDevPort(options.devPort) + 2
                 }
             }, {
-                reload: false
+                reload: config.dev.reloadOnServerChange
             })
         );
     }

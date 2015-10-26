@@ -1,11 +1,18 @@
-/*eslint-disable */
-'use strict';
-/*eslint-enable */
+import 'source-map-support/register';
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-module.exports = function writeStats(stats) {
+/**
+ * A Webpack plugin that writes stats after a completed build.
+ *
+ * Will create two files:
+ *  * `webpack-stats.json` - Containes what files that was created for CSS and JS.
+ *  * `webpack-analysis.json` - Containes all stats from the Webpack build. Analyse with webpack.github.io/analyse
+ * @param {!object} stats - Webpack stats object.
+ * @private
+ */
+export default function writeStats(stats) {
     const publicPath = this.options.output.publicPath;
     const statsFilepath = path.join(this.options.output.path, 'webpack-stats.json');
     const analysisFilepath = path.join(this.options.output.path, 'webpack-analysis.json');
@@ -13,8 +20,7 @@ module.exports = function writeStats(stats) {
     const json = stats.toJson();
 
     // get chunks by name and extensions
-    function getChunks(name, e) {
-        const ext = e || 'js';
+    function getChunks(name, ext = 'js') {
         let chunk = json.assetsByChunkName[name];
 
         // a chunk could be a string or an array, so make sure it is an array
@@ -23,23 +29,18 @@ module.exports = function writeStats(stats) {
         }
 
         return chunk
-        // filter by extension
-        .filter(function(chunkName) {
-            return path.extname(chunkName) === '.' + ext;
-        })
-        .map(function(chunkName) {
-            return publicPath + chunkName;
-        });
+            .filter((chunkName) => path.extname(chunkName) === `.${ext}`)
+            .map((chunkName) => publicPath + chunkName);
     }
 
     const script = getChunks('app', 'js');
     const css = getChunks('app', 'css');
 
     const content = {
-        script: script,
-        css: css
+        script,
+        css
     };
 
     fs.writeFileSync(statsFilepath, JSON.stringify(content));
     fs.writeFileSync(analysisFilepath, JSON.stringify(json));
-};
+}
