@@ -376,6 +376,7 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
 
     return {
         config: webpackConfig,
-        build: webpack
+        build: webpack,
+        devPath: getDevPath()
     };
 }
