@@ -420,7 +420,6 @@ export default function createBuilder(options, resolver = 'roc-web/lib/helpers/g
 
     return {
         config: webpackConfig,
-        build: webpack,
-        devPath: getDevPath()
+        build: webpack
     };
 }
