@@ -60,6 +60,11 @@ export default function createServer(options = {}) {
     function start(port) {
         port = port || process.env.PORT || config.port;
         server.listen(port);
+
+        if (process.send) {
+            process.send('online');
+        }
+
         debug('roc:server')(`Server started on port ${port}`);
     }
 

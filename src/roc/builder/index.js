@@ -4,11 +4,9 @@ import webpack from 'webpack';
 import path from 'path';
 import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
 
-import { getDevPath, getDevPort } from '../helpers/dev';
+import { getDevPath } from '../helpers/dev';
 import writeStats from './utils/write-stats';
-import config from './../helpers/get-config';
 
 const bourbon = './node_modules/bourbon/app/assets/stylesheets/';
 const neat = './node_modules/bourbon-neat/app/assets/stylesheets/';
@@ -361,42 +359,6 @@ export default function createBuilder(options, resolver = 'roc-web/lib/helpers/g
                     drop_debugger: true
                 }
                 /* eslint-enable */
-            })
-        );
-    }
-
-    const getPort = port => port || process.env.PORT || config.port;
-
-    if (SERVER && DEV && !TEST) {
-        // The logic here is to make sure we don't override options set by something else
-        // We merge if the debug option has changed since we touched it last otherwise we jsut use the new value
-        const debugOptions = `<script>
-            if (localStorage.debugTemp === localStorage.debug) {
-                localStorage.debug = '${config.dev.debug}';
-            } else {
-                localStorage.debug = localStorage.debug + ',${config.dev.debug}';
-            }
-            localStorage.debugTemp = localStorage.debug;
-        </script>`;
-
-        webpackConfig.plugins.push(
-            new BrowserSyncPlugin({
-                port: getDevPort(options.devPort) + 1,
-                proxy: `0.0.0.0:${getPort(options.port)}`,
-                snippetOptions: {
-                    rule: {
-                        match: /<\/body>/i,
-                        fn: (snippet, match) => {
-                            return debugOptions + snippet + match;
-                        }
-                    }
-                },
-                open: false,
-                ui: {
-                    port: getDevPort(options.devPort) + 2
-                }
-            }, {
-                reload: config.dev.reloadOnServerChange
             })
         );
     }

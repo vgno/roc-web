@@ -1,10 +1,11 @@
 import 'source-map-support/register';
 
 import path from 'path';
+import deepAssign from 'deep-assign';
 
 const baseConfig = require('../default/roc.config.js');
 const appConfig = require(path.join(process.cwd(), 'roc.config.js'));
-const config = Object.assign(baseConfig, appConfig);
+const config = deepAssign(baseConfig, appConfig);
 
 /**
  * Exports the merged `roc.config.js`.

@@ -45,7 +45,9 @@ export default {
             'roc.config.js'
         ],
         // If Browsersync should reload the browser when the server is rebuilt.
-        reloadOnServerChange: false
+        reloadOnServerChange: false,
+        // If Browsersync should open the server when it has started
+        open: false
     }
 };
 ```
