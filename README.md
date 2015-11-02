@@ -1,6 +1,6 @@
 # roc-web
 
-Base egg for web applications built with Roc. Uses mainly __Koa__ and __Webpack__ internally.
+Base extension for web applications built with Roc. Uses mainly __Koa__ and __Webpack__ internally.
 
 ## Build an application
 When creating an application based on __roc-web__ you use `createServer`. It returns an object that has a start method on it that can be invoked to run the application.
@@ -20,7 +20,7 @@ server.start();
 The application can be configured through the use of a `roc.config.js` file as well as setting options in the functions. Please look at the JSDoc for the complete interface.
 
 ### roc.config.js
-This is the default configuration that will used if not overridden as either options in functions, like above, or creating a `roc.config.js` from where the application is started, the application root.
+This is the default configuration that will be used if not overridden as either options in functions, like above, or creating a `roc.config.js` from where the application is started, the application root.
 ```javascript
 export default {
     // Port for the server to use.

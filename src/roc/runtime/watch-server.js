@@ -55,7 +55,8 @@ export default function watchServer(compiler, options = {}) {
                     rule: {
                         match: /<\/body>/i,
                         fn: (snippet, match) => {
-                            // Makes sure we are not overwriting the debug state of something has changed it
+                            // The logic here is to make sure we don't override options set by something else
+                            // We merge if the debug option has changed since we touched it last
                             const debugOptions = (
                                 `<script>
                                     if (localStorage.debugTemp === localStorage.debug) {
