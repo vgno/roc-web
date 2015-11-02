@@ -4,7 +4,14 @@ import path from 'path';
 import deepAssign from 'deep-assign';
 
 const baseConfig = require('../default/roc.config.js');
-const appConfig = require(path.join(process.cwd(), 'roc.config.js'));
+
+let appConfig = {};
+try {
+    appConfig = require(path.join(process.cwd(), 'roc.config.js'));
+} catch (error) {
+    // Do nothing, just use the base config
+}
+
 const config = deepAssign(baseConfig, appConfig);
 
 /**
