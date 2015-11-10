@@ -1,26 +1,9 @@
 /**
- * Roc build config.
- *
- * @typedef {Object} rocBuildConfig
- * @property {!string} mode - Which mode it should be built for, either `dev`, `test` or `dist`.
- * @property {!string} target - The target for the build, either `server` or `client`.
- * @property {!outputPath} outputPath - Where the build should be saved.
- * @property {!string} entry - Entry file for the build.
- * @property {number} [port] - The port that the server will be started on, need to match for Browsersync to work. This
- * is not used to start the actuall application. Uses the same logic as for {@link startServer}.
- * @property {number} [devPort] - The port to start the dev server on.
- * @property {boolean} [moduleBuild] - If building a module.
- * @property {string} [module] - Entry file for a module, only needed if building a module and `moduleBuild` is true.
- * @property {string} [moduleStyle] - Default styles for a module, only needed if building a module and `moduleBuild`
-  is true.
- */
-
-/**
  * Roc builder object.
  *
  * @typedef {Object} rocBuilder
- * @property {object} config - Webpack config object, can be used to extend the configuration.
- * @property {object} build - Webpack instance.
+ * @property {object} buildConfig - Webpack config object, can be used to extend the configuration.
+ * @property {object} builder - Webpack instance.
  * @see https://webpack.github.io/
  */
 

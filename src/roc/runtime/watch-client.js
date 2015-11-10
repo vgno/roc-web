@@ -5,43 +5,40 @@ import koa from 'koa';
 import koaWebpackDevMiddleware from 'koa-webpack-dev-middleware';
 import koaWebpackHotMiddleware from 'koa-webpack-hot-middleware';
 
-import { getDevPort } from '../helpers/dev';
-import config from '../helpers/get-config';
-
-debug.enable(config.dev.debug);
+import { getDevPort } from '../helpers/general';
+import { getConfig } from '../helpers/config';
 
 /**
  * Client watcher.
  *
  * @param {object} compiler - Webpack compiler instance.
- * @param {{devPort: number}} [options] - Options for the client watcher.
  * @returns {Promise} Resolves after it has completed.
  */
-export default function watchClient(compiler, options = {}) {
+export default function watchClient(compiler) {
+    const config = getConfig();
+    debug.enable(config.dev.debug);
+
     return new Promise((resolve, reject) => {
         if (!compiler) {
             return reject(new Error('A compiler instance must be passed in order to watch client!'));
         }
-
-        let { devPort } = options;
-
-        devPort = getDevPort(devPort);
+        const devPort = getDevPort();
 
         const server = koa();
 
         server.use(
             koaWebpackDevMiddleware(compiler, {
                 publicPath: compiler.options.output.publicPath,
-                noInfo: true,
-                quiet: false,
-                lazy: false
+                noInfo: config.dev.devMiddleware.noInfo,
+                quiet: config.dev.devMiddleware.quiet
             })
         );
 
         server.use(
             koaWebpackHotMiddleware(compiler, {
-                publicPath: compiler.options.output.publicPath,
-                noInfo: false
+                reload: config.dev.hotMiddleware.reload,
+                noInfo: config.dev.hotMiddleware.noInfo,
+                quiet: config.dev.hotMiddleware.quiet
             })
         );
 

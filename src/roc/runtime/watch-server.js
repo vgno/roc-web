@@ -6,24 +6,19 @@ import watch from 'node-watch';
 import browserSync from 'browser-sync';
 import childProcess from 'child_process';
 
-import { getDevPort } from '../helpers/dev';
-import config from '../helpers/get-config';
-
-debug.enable(config.dev.debug);
-
-const getPort = port => port || process.env.PORT || config.port;
+import { getDevPort, getPort } from '../helpers/general';
+import { getConfig } from '../helpers/config';
 
 /**
  * Server watcher.
  *
- * Will restart the server when detecting a change in the application bundle along with what is configured in
- * 'roc.config.js'.
- *
  * @param {object} compiler - a Webpack compiler instance
- * @param {{port: number, devPort: number}} [options] - Options for the server watcher.
  * @returns {Promise} Resolves after it has completed.
  */
-export default function watchServer(compiler, options = {}) {
+export default function watchServer(compiler) {
+    const config = getConfig();
+    debug.enable(config.dev.debug);
+
     const watcherLogger = debug('roc:dev:server:watcher');
     const builderLogger = debug('roc:dev:server:builder');
 
@@ -46,11 +41,9 @@ export default function watchServer(compiler, options = {}) {
         };
 
         const initBrowsersync = () => {
-            const { port, devPort } = options;
-
             browserSync({
-                port: getDevPort(devPort) + 1,
-                proxy: `0.0.0.0:${getPort(port)}`,
+                port: parseInt(getDevPort(), 10) + 1,
+                proxy: `0.0.0.0:${getPort()}`,
                 snippetOptions: {
                     rule: {
                         match: /<\/body>/i,
@@ -73,7 +66,7 @@ export default function watchServer(compiler, options = {}) {
                 },
                 open: config.dev.open,
                 ui: {
-                    port: getDevPort(devPort) + 2
+                    port: parseInt(getDevPort(), 10) + 2
                 }
             });
         };
@@ -99,6 +92,7 @@ export default function watchServer(compiler, options = {}) {
 
         startServer = () => {
             server = childProcess.fork(bundlePath);
+            process.on('exit', () => server.kill('SIGTERM'));
 
             server.once('message', (message) => {
                 if (message.match(/^online$/)) {
@@ -132,10 +126,12 @@ export default function watchServer(compiler, options = {}) {
             const statsJson = serverStats.toJson();
             builderLogger(`Server rebuilt ${statsJson.time} ms`);
 
+            // FIXME
             if (statsJson.errors.length > 0) {
                 statsJson.errors.map(err => console.log(err));
             }
 
+            // FIXME
             if (statsJson.warnings.length > 0) {
                 statsJson.warnings.map(wrn => console.log(wrn));
             }

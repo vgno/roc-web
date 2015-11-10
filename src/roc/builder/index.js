@@ -4,8 +4,10 @@ import webpack from 'webpack';
 import path from 'path';
 import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import { validate } from 'roc-config';
 
-import { getDevPath } from '../helpers/dev';
+import { getConfig, metaConfig } from '../helpers/config';
+import { getDevPath, getAbsolutePath } from '../helpers/general';
 import writeStats from './utils/write-stats';
 
 const bourbon = './node_modules/bourbon/app/assets/stylesheets/';
@@ -14,37 +16,35 @@ const neat = './node_modules/bourbon-neat/app/assets/stylesheets/';
 /**
   * Creates a builder.
   *
-  * @param {!rocBuildConfig} options - Options for the builder.
+  * @param {!string} target - a target: should be either "client" or "server"
   * @param {!string} [resolver=roc-web/lib/helpers/get-resolve-path] - Path to the resolver for the server side
-  * {@link getResolvePath}.
+  * {@link getResolvePath}
   * @returns {rocBuilder}
   */
-export default function createBuilder(options, resolver = 'roc-web/lib/helpers/get-resolve-path') {
-    const allowedModes = ['dev', 'test', 'dist'];
+export default function createBuilder(target, resolver = 'roc-web/lib/helpers/get-resolve-path') {
     const allowedTargets = ['server', 'client'];
 
-    if (allowedModes.indexOf(options.mode) === -1) {
-        throw new Error(`Invalid mode, must be one of ${allowedModes}. Was instead ${options.mode}.`);
+    if (allowedTargets.indexOf(target) === -1) {
+        throw new Error(`Invalid target, must be one of ${allowedTargets}. Was instead ${target}.`);
     }
 
-    if (allowedTargets.indexOf(options.target) === -1) {
-        throw new Error(`Invalid target, must be one of ${allowedTargets}. Was instead ${options.target}.`);
-    }
+    const config = getConfig();
+    validate(config, metaConfig);
 
-    if (!options.outputPath) {
-        throw new Error('A output path needs to be defined in the options.');
-    }
+    const DEV = (config.build.mode === 'dev');
+    const TEST = (config.build.mode === 'test');
+    const DIST = (config.build.mode === 'dist');
 
-    const DEV = (options.mode === 'dev');
-    const TEST = (options.mode === 'test');
-    const DIST = (options.mode === 'dist');
+    const SERVER = (target === 'server');
+    const CLIENT = (target === 'client');
 
-    const SERVER = (options.target === 'server');
-    const CLIENT = (options.target === 'client');
-
-    const COMPONENT_BUILD = !!options.componentBuild;
+    const COMPONENT_BUILD = !!config.build.moduleBuild;
 
     const ENV = DIST ? 'production' : 'development';
+
+    const entry = getAbsolutePath(config.build.entry[target]);
+    const outputPath = getAbsolutePath(config.build.outputPath[target]);
+    const componentStyle = getAbsolutePath(config.build.moduleStyle);
 
     let webpackConfig = {};
 
@@ -66,14 +66,14 @@ export default function createBuilder(options, resolver = 'roc-web/lib/helpers/g
     } else if (CLIENT && DEV) {
         webpackConfig.entry = {
             app: [
-                `webpack-hot-middleware/client?path=${getDevPath(options.devPort)}__webpack_hmr`,
-                options.entry
+                `webpack-hot-middleware/client?path=${getDevPath()}__webpack_hmr`,
+                entry
             ]
         };
     } else if (CLIENT) {
         webpackConfig.entry = {
             app: [
-                options.entry
+                entry
             ]
         };
     }
@@ -85,13 +85,11 @@ export default function createBuilder(options, resolver = 'roc-web/lib/helpers/g
         webpackConfig.target = 'node';
     }
 
-    const devPath = getDevPath(options.devPort, options.outputPath.relative);
-
     if (SERVER) {
         webpackConfig.externals = [
             {
                 [resolver]: true,
-                ['roc-web/lib/helpers/get-config']: true
+                ['roc-web/lib/helpers/config']: true
             },
             function(context, request, callback) {
                 // If a roc module include it in the bundle
@@ -132,8 +130,8 @@ export default function createBuilder(options, resolver = 'roc-web/lib/helpers/g
         webpackConfig.output = {};
     } else {
         webpackConfig.output = {
-            path: options.outputPath.absolute,
-            publicPath: DIST ? '/' : devPath,
+            path: outputPath,
+            publicPath: DIST ? '/' : getDevPath(config.build.outputPath[target]),
             filename: (DIST && CLIENT) ? '[name].[hash].js' : '[name].bundle.js',
             chunkFilename: (DIST && CLIENT) ? '[name].[hash].js' : '[name].bundle.js'
         };
@@ -317,7 +315,7 @@ export default function createBuilder(options, resolver = 'roc-web/lib/helpers/g
             '__DIST__': DIST,
             '__SERVER__': SERVER,
             '__CLIENT__': CLIENT,
-            'ROC_SERVER_ENTRY': JSON.stringify(options.entry),
+            'ROC_SERVER_ENTRY': JSON.stringify(entry),
             'ROC_PATH_RESOLVER': JSON.stringify(resolver)
         })
     );
@@ -374,14 +372,14 @@ export default function createBuilder(options, resolver = 'roc-web/lib/helpers/g
 
         webpackConfig.plugins.push(
             new webpack.DefinePlugin({
-                COMPONENT_ENTRY: JSON.stringify(options.component),
-                COMPONENT_STYLE: JSON.stringify(options.componentStyle)
+                COMPONENT_ENTRY: JSON.stringify(entry),
+                COMPONENT_STYLE: JSON.stringify(componentStyle)
             })
         );
     }
 
     return {
-        config: webpackConfig,
-        build: webpack
+        buildConfig: webpackConfig,
+        builder: webpack
     };
 }

@@ -2,6 +2,15 @@
 
 Base extension for web applications built with Roc. Uses mainly __Koa__ and __Webpack__ internally.
 
+## Examples
+There is some examples in `examples/` that shows how `roc-web` can be used directly. To test them out you will need to run `npm link`.
+
+1. Run `npm install` in the base of `roc-web`.
+2. Run `npm build` in the base of `roc-web`.
+3. Run `npm link` in the base of `roc-web`.
+4. Go to the example you want and run `npm link roc-web`.
+5. Using the `roc-cli` run `roc run dev` to get started.
+
 ## Build an application
 When creating an application based on __roc-web__ you use `createServer`. It returns an object that has a start method on it that can be invoked to run the application.
 

@@ -23,13 +23,32 @@ const config = {
         // If Browsersync should reload the browser when the server is rebuilt.
         reloadOnServerChange: false,
         // If Browsersync should open the server when it has started
-        open: false
+        open: false,
+        devMiddleware: {
+            noInfo: true,
+            quiet: false
+        },
+        hotMiddleware: {
+            reload: false,
+            noInfo: false,
+            quiet: false
+        }
+    },
+
+    build: {
+        mode: 'dist',
+        target: ['client', 'server'],
+        entry: { client: 'src/client/index.js', server: 'src/server/index.js'},
+        outputPath: { client: 'build/client', server: 'build/server'},
+
+        moduleBuild: false,
+        moduleStyle: ''
     }
 };
 
 /**
  * Exports the default `roc.config.js`.
  *
- * @return {object} configFile - The default `roc.config.js`.
+ * @return {object} The default `roc.config.js`.
  */
 export default config;

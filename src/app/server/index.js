@@ -10,7 +10,7 @@ import koaFavicon from 'koa-favicon';
 import koaAccesslog from 'koa-accesslog';
 import koaLogger from 'koa-logger';
 
-const config = require('roc-web/lib/helpers/get-config');
+const config = require('roc-web/lib/helpers/config').getConfig();
 
 /**
  * Creates a server instance.
@@ -34,7 +34,11 @@ export default function createServer(options = {}) {
     server.use(helmet());
 
     server.use(koaEtag());
-    server.use(koaCompressor());
+
+    // We only enable gzip in dist
+    if (__DIST__) {
+        server.use(koaCompressor());
+    }
 
     const favicon = options.favicon || config.favicon;
     if (favicon) {
