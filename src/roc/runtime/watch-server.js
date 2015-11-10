@@ -84,6 +84,7 @@ export default function watchServer(compiler) {
         };
 
         const listenForInput = (key = 'rs') => {
+            watcherLogger(`You can restart the server by entering "${key}" and pressing enter"`);
             process.stdin.resume();
             process.stdin.setEncoding('utf8');
             process.stdin.on('data', function(data) {
