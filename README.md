@@ -11,6 +11,11 @@ There is some examples in `examples/` that shows how `roc-web` can be used direc
 4. Go to the example you want and run `npm link roc-web`.
 5. Using the `roc-cli` run `roc run dev` to get started.
 
+## Tips
+
+### Restart Server in Dev Mode
+You can restart the server when running the application in development mode by typing `rs` in the terminal window and hitting enter.
+
 ## Build an application
 When creating an application based on __roc-web__ you use `createServer`. It returns an object that has a start method on it that can be invoked to run the application.
 

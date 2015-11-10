@@ -24,6 +24,11 @@ export default function watchServer(compiler) {
 
     let initiated = false;
 
+    /*
+    * We only want to init this function once, however it will be called everytime the builder has created a new build.
+    * Because of this reason we have a flag that makes sure the function only runs once, the first time we have a
+    * completed build.
+    */
     const initServer = (bundlePath) => {
         if (initiated) {
             return;
@@ -90,6 +95,11 @@ export default function watchServer(compiler) {
             });
         };
 
+        /*
+        * This function runs everytime the server is restarted, which could be because of user input or a file that has
+        * been changed. To make sure we only start Browsersync once along with only one input listner and one file
+        * watcher we have a flag, once.
+        */
         startServer = () => {
             server = childProcess.fork(bundlePath);
             process.on('exit', () => server.kill('SIGTERM'));
