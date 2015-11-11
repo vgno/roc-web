@@ -6,6 +6,8 @@ import watch from 'node-watch';
 import browserSync from 'browser-sync';
 import childProcess from 'child_process';
 
+import { getApplicationConfigPath, getTemporaryConfig } from 'roc-config';
+
 import { getDevPort, getPort } from '../helpers/general';
 import { getConfig } from '../helpers/config';
 
@@ -102,7 +104,12 @@ export default function watchServer(compiler) {
         * watcher we have a flag, once.
         */
         startServer = () => {
-            server = childProcess.fork(bundlePath);
+            const env = {
+                ...process.env,
+                ROC_CONFIG: getApplicationConfigPath(),
+                ROC_CONFIG_OBJECT: JSON.stringify(getTemporaryConfig())
+            };
+            server = childProcess.fork(bundlePath, { env });
             process.on('exit', () => server.kill('SIGTERM'));
 
             server.once('message', (message) => {

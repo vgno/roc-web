@@ -24,7 +24,7 @@ const writeStatsFile = (buildPath, scriptPath) => {
 const startWatcher = (target, compiler, buildConfig, watcher) => {
     if (target === 'client') {
         // FIXME The bundle name should not be static
-        writeStatsFile(buildConfig.output.path, path.join(buildConfig.output.publicPath, 'app.client.bundle.js'));
+        writeStatsFile(buildConfig.output.path, buildConfig.output.publicPath + 'app.client.bundle.js');
     }
 
     return watcher[target](compiler);

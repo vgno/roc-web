@@ -14,13 +14,13 @@ const bourbon = './node_modules/bourbon/app/assets/stylesheets/';
 const neat = './node_modules/bourbon-neat/app/assets/stylesheets/';
 
 /**
-  * Creates a builder.
-  *
-  * @param {!string} target - a target: should be either "client" or "server"
-  * @param {!string} [resolver=roc-web/lib/helpers/get-resolve-path] - Path to the resolver for the server side
-  * {@link getResolvePath}
-  * @returns {rocBuilder}
-  */
+ * Creates a builder.
+ *
+ * @param {!string} target - a target: should be either "client" or "server"
+ * @param {!string} [resolver=roc-web/lib/helpers/get-resolve-path] - Path to the resolver for the server side
+ * {@link getResolvePath}
+ * @returns {rocBuilder}
+ */
 export default function createBuilder(target, resolver = 'roc-web/lib/helpers/get-resolve-path') {
     const allowedTargets = ['server', 'client'];
 

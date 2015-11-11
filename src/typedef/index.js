@@ -39,7 +39,7 @@
 /**
  * Roc server options.
  *
- * Used in {@link createConfig}.
+ * Used in {@link createServer}.
  *
  * Both of this options can also be set in `roc.config.js` however these values will override them if provided.
  *
