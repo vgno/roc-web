@@ -6,7 +6,9 @@ const config = {
         server: 'roc:*'
     },
     // What folder the server should expose.
-    serve: [],
+    serve: [
+        'build/client'
+    ],
     // Path to the favicon file, specially handled on the server.
     favicon: '',
 
