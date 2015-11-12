@@ -8,7 +8,7 @@ import { validate } from 'roc-config';
 
 import { getConfig, metaConfig } from '../helpers/config';
 import { getDevPath, getAbsolutePath } from '../helpers/general';
-import writeStats from './utils/write-stats';
+import { writeStats } from './utils/stats';
 
 const bourbon = './node_modules/bourbon/app/assets/stylesheets/';
 const neat = './node_modules/bourbon-neat/app/assets/stylesheets/';

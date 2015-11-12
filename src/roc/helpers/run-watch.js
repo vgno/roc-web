@@ -3,7 +3,7 @@ import path from 'path';
 import colors from 'colors/safe';
 import mkdirp from 'mkdirp';
 
-import { setApplicationConfig, setTemporaryConfig, validate } from 'roc-config';
+import { setApplicationConfig, getApplicationConfig, setTemporaryConfig, validate } from 'roc-config';
 
 import clean from '../builder/utils/clean';
 import { getConfig, metaConfig, baseConfig } from '../helpers/config';
@@ -51,18 +51,17 @@ const createWatcher = (config, target, createBuilder, watcher) => {
  * Helper for starting an application in watch mode.
  *
  * @param {!object} rocExtension - The Roc Extension to use when starting the watcher
- * @param {string} [applicationConfig] - A path to a `roc.config.js` file that should be used
- * @param {object} [temporaryConfig] - A configuration object that should be used
+ * @param {string} [appConfigPath] - A path to a `roc.config.js` file that should be used
+ * @param {object} [tempConfig] - A configuration object that should be used
  */
-export default function runWatch(rocExtension, applicationConfig = '', temporaryConfig = {}) {
-    const { createBuilder, watchClient, watchServer } = rocExtension;
+export default function runWatch({ createBuilder, watchClient, watchServer }, appConfigPath = '', tempConfig = {}) {
     const watcher = {
         client: watchClient,
         server: watchServer
     };
 
-    setApplicationConfig(applicationConfig);
-    setTemporaryConfig(temporaryConfig);
+    setApplicationConfig(appConfigPath);
+    setTemporaryConfig(tempConfig);
 
     let config = getConfig();
 
@@ -77,6 +76,14 @@ export default function runWatch(rocExtension, applicationConfig = '', temporary
 
         setTemporaryConfig({build: {mode: 'dev'}});
         config = getConfig();
+    }
+
+    const applicationConfig = getApplicationConfig();
+    if (applicationConfig.createBuilder) {
+        /* eslint-disable no-console */
+        console.log(colors.cyan(`Using the 'createBuilder' defined in the configuration file.\n`));
+        /* eslint-enable */
+        createBuilder = applicationConfig.createBuilder;
     }
 
     validate(config, metaConfig);

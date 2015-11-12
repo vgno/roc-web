@@ -10,7 +10,7 @@ import { getApplicationConfigPath, getTemporaryConfig } from 'roc-config';
 
 import { getDevPort, getPort } from '../helpers/general';
 import { getConfig } from '../helpers/config';
-
+import { parseStats } from '../builder/utils/stats';
 /**
  * Server watcher.
  *
@@ -157,7 +157,8 @@ export default function watchServer(compiler) {
             let bundleName = 'app.server.bundle.js';
 
             if (statsJson.assets && statsJson.assets.length > 0) {
-                bundleName = statsJson.assets[0].name;
+                const stats = parseStats(statsJson);
+                bundleName = stats.script[0];
             }
 
             const artifact = path.join(compiler.outputPath, '/', bundleName);

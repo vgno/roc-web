@@ -6,7 +6,7 @@ import MultiProgress from 'multi-progress';
 import pretty from 'prettysize';
 import colors from 'colors/safe';
 
-import { setApplicationConfig, setTemporaryConfig, validate } from 'roc-config';
+import { setApplicationConfig, getApplicationConfig, setTemporaryConfig, validate } from 'roc-config';
 
 import clean from '../builder/utils/clean';
 import { getConfig, metaConfig } from '../helpers/config';
@@ -96,18 +96,22 @@ const build = (createBuilder, target, config) => {
  * Helper for building an application.
  *
  * @param {!object} rocExtension - The Roc Extension to use when building
- * @param {string} [applicationConfig] - A path to a `roc.config.js` file that should be used
- * @param {object} [temporaryConfig] - A configuration object that should be used
+ * @param {string} [appConfigPath] - A path to a `roc.config.js` file that should be used
+ * @param {object} [tempConfig] - A configuration object that should be used
  */
-export default function runBuild(rocExtension, applicationConfig = '', temporaryConfig = {}) {
-    const { createBuilder } = rocExtension;
-
-    setApplicationConfig(applicationConfig);
-    setTemporaryConfig(temporaryConfig);
+export default function runBuild({ createBuilder }, appConfigPath = '', tempConfig = {}) {
+    setApplicationConfig(appConfigPath);
+    setTemporaryConfig(tempConfig);
     const config = getConfig();
 
+    const applicationConfig = getApplicationConfig();
+    if (applicationConfig.createBuilder) {
+        console.log(colors.cyan(`Using the 'createBuilder' defined in the configuration file.\n`));
+        createBuilder = applicationConfig.createBuilder;
+    }
+
     /* eslint-disable no-console */
-    console.log(colors.cyan(`Starting the builder using "${config.build.mode}" as the mode.`));
+    console.log(colors.cyan(`Starting the builder using "${config.build.mode}" as the mode.\n`));
     /* eslint-enable */
 
     validate(config, metaConfig);
