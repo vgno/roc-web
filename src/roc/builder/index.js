@@ -1,43 +1,50 @@
-import { getDevPath } from './utils/dev';
+import 'source-map-support/register';
+
 import webpack from 'webpack';
 import path from 'path';
-
 import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
-import writeStats from './utils/write-stats';
+import { validate } from 'roc-config';
+
+import { getConfig, metaConfig } from '../helpers/config';
+import { getDevPath, getAbsolutePath } from '../helpers/general';
+import { writeStats } from './utils/stats';
 
 const bourbon = './node_modules/bourbon/app/assets/stylesheets/';
 const neat = './node_modules/bourbon-neat/app/assets/stylesheets/';
 
-/* resolver: should be a path to a file that will return the final new NODE_PATH
+/**
+ * Creates a builder.
+ *
+ * @param {!string} target - a target: should be either "client" or "server"
+ * @param {!string} [resolver=roc-web/lib/helpers/get-resolve-path] - Path to the resolver for the server side
+ * {@link getResolvePath}
+ * @returns {rocBuilder}
  */
-export default function createBuilder(options, resolver = 'roc-web/lib/get-resolve-path') {
-    const allowedModes = ['dev', 'test', 'dist'];
+export default function createBuilder(target, resolver = 'roc-web/lib/helpers/get-resolve-path') {
     const allowedTargets = ['server', 'client'];
 
-    if (allowedModes.indexOf(options.mode) === -1) {
-        throw new Error(`Invalid mode, must be one of ${allowedModes}. Was instead ${options.mode}.`);
+    if (allowedTargets.indexOf(target) === -1) {
+        throw new Error(`Invalid target, must be one of ${allowedTargets}. Was instead ${target}.`);
     }
 
-    if (allowedTargets.indexOf(options.target) === -1) {
-        throw new Error(`Invalid target, must be one of ${allowedTargets}. Was instead ${options.target}.`);
-    }
+    const config = getConfig();
+    validate(config, metaConfig);
 
-    if (!options.outputPath) {
-        throw new Error('A output path needs to be defined in the options.');
-    }
+    const DEV = (config.build.mode === 'dev');
+    const TEST = (config.build.mode === 'test');
+    const DIST = (config.build.mode === 'dist');
 
-    const DEV = (options.mode === 'dev');
-    const TEST = (options.mode === 'test');
-    const DIST = (options.mode === 'dist');
+    const SERVER = (target === 'server');
+    const CLIENT = (target === 'client');
 
-    const SERVER = (options.target === 'server');
-    const CLIENT = (options.target === 'client');
-
-    const COMPONENT_BUILD = !!options.componentBuild;
+    const COMPONENT_BUILD = !!config.build.moduleBuild;
 
     const ENV = DIST ? 'production' : 'development';
+
+    const entry = getAbsolutePath(config.build.entry[target]);
+    const outputPath = getAbsolutePath(config.build.outputPath[target]);
+    const componentStyle = getAbsolutePath(config.build.moduleStyle);
 
     let webpackConfig = {};
 
@@ -50,8 +57,23 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
     */
     if (SERVER) {
         webpackConfig.entry = {
-            app: [
-                require.resolve('../../app/server-entry')
+            [config.build.outputName]: [
+                require.resolve('../../src/app/server-entry')
+            ]
+        };
+    } else if (TEST) {
+        webpackConfig.entry = {};
+    } else if (CLIENT && DEV) {
+        webpackConfig.entry = {
+            [config.build.outputName]: [
+                `webpack-hot-middleware/client?path=${getDevPath()}__webpack_hmr`,
+                entry
+            ]
+        };
+    } else if (CLIENT) {
+        webpackConfig.entry = {
+            [config.build.outputName]: [
+                entry
             ]
         };
     }
@@ -63,14 +85,11 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         webpackConfig.target = 'node';
     }
 
-    const devPath = getDevPath({
-        buildPath: options.outputPath
-    });
-
     if (SERVER) {
         webpackConfig.externals = [
             {
-                [resolver]: true
+                [resolver]: true,
+                ['roc-web/lib/helpers/config']: true
             },
             function(context, request, callback) {
                 // If a roc module include it in the bundle
@@ -92,7 +111,8 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
     /**
     * Devtool
     *
-    * TODO: Consider tweaking this option & handle production correct
+    * TODO
+    * Consider tweaking this option & handle production correct
     * We want the source map files to be stored on a seperate server.
     */
     if (CLIENT && DEV) {
@@ -110,19 +130,15 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         webpackConfig.output = {};
     } else {
         webpackConfig.output = {
-            path: options.outputPath.absolute,
-            publicPath: DIST ? '/' : devPath,
-            filename: (DIST && CLIENT) ? '[name].[hash].js' : '[name].bundle.js',
-            chunkFilename: (DIST && CLIENT) ? '[name].[hash].js' : '[name].bundle.js'
+            path: outputPath,
+            publicPath: DIST ? config.path : getDevPath(),
+            filename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js',
+            chunkFilename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js'
         };
     }
 
     if (SERVER) {
         webpackConfig.output.libraryTarget = 'commonjs2';
-    }
-
-    if (CLIENT && DEV) {
-        webpackConfig.output.filename = '[name].client.bundle.js';
     }
 
     /**
@@ -295,7 +311,7 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
             '__DIST__': DIST,
             '__SERVER__': SERVER,
             '__CLIENT__': CLIENT,
-            'ROC_SERVER_ENTRY': JSON.stringify(options.entry),
+            'ROC_SERVER_ENTRY': JSON.stringify(entry),
             'ROC_PATH_RESOLVER': JSON.stringify(resolver)
         })
     );
@@ -341,22 +357,6 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
         );
     }
 
-    // FIXME
-    if (CLIENT && DEV && !TEST) {
-        webpackConfig.plugins.push(
-            new BrowserSyncPlugin({
-                host: 'localhost',
-                port: 3002,
-                logFileChanges: false,
-                ui: {
-                    port: 3003
-                }
-            }, {
-                reload: false
-            })
-        );
-    }
-
     if (COMPONENT_BUILD) {
         webpackConfig.output.libraryTarget = 'umd';
         webpackConfig.output.filename = '[name].component.js';
@@ -368,15 +368,14 @@ export default function createBuilder(options, resolver = 'roc-web/lib/get-resol
 
         webpackConfig.plugins.push(
             new webpack.DefinePlugin({
-                COMPONENT_ENTRY: JSON.stringify(options.component),
-                COMPONENT_STYLE: JSON.stringify(options.componentStyle)
+                COMPONENT_ENTRY: JSON.stringify(entry),
+                COMPONENT_STYLE: JSON.stringify(componentStyle)
             })
         );
     }
 
     return {
-        config: webpackConfig,
-        build: webpack,
-        devPath: getDevPath()
+        buildConfig: webpackConfig,
+        builder: webpack
     };
 }
