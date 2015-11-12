@@ -59,7 +59,7 @@ export function getDevPort() {
 export function getPort() {
     const config = getConfig();
 
-    if (config.dev.port && process.env.PORT && oncePort) {
+    if (config.port && process.env.PORT && oncePort) {
         oncePort = false;
         /* eslint-disable no-console */
         console.log(colors.red('You have configured a port but the environment ' +
