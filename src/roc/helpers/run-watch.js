@@ -21,10 +21,9 @@ const writeStatsFile = (buildPath, scriptPath) => {
     });
 };
 
-const startWatcher = (target, compiler, buildConfig, watcher) => {
+const startWatcher = (target, compiler, buildConfig, watcher, outputName) => {
     if (target === 'client') {
-        // FIXME The bundle name should not be static
-        writeStatsFile(buildConfig.output.path, buildConfig.output.publicPath + 'app.client.bundle.js');
+        writeStatsFile(buildConfig.output.path, buildConfig.output.publicPath + outputName + '.roc.js');
     }
 
     return watcher[target](compiler);
@@ -35,7 +34,7 @@ const createWatcher = (config, target, createBuilder, watcher) => {
         .then(() => {
             const { buildConfig, builder } = createBuilder(target);
             const compiler = builder(buildConfig);
-            return startWatcher(target, compiler, buildConfig, watcher);
+            return startWatcher(target, compiler, buildConfig, watcher, config.build.outputName);
         })
         .catch((error) => {
             /* eslint-disable no-console */

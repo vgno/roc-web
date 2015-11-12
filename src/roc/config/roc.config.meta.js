@@ -5,6 +5,7 @@ const configMeta = {
     },
     serve: 'What folder the server should expose',
     favicon: 'Path to the favicon file, specially handled on the server',
+    path: 'The basepath for the application',
 
     dev: {
         debug: 'Filter for debug messages that should be shown for the server, see https://www.npmjs.com/package/debug',
@@ -30,6 +31,7 @@ const configMeta = {
             client: 'The client entry point file',
             server: 'The server entry point file'
         },
+        outputName: 'The name of the generated application bundle, will be appended "roc.js"',
         outputPath: {
             client: 'The output directory for the client build',
             server: 'The output directory for the server build'

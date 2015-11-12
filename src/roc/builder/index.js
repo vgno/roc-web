@@ -57,7 +57,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     */
     if (SERVER) {
         webpackConfig.entry = {
-            app: [
+            [config.build.outputName]: [
                 require.resolve('../../src/app/server-entry')
             ]
         };
@@ -65,14 +65,14 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         webpackConfig.entry = {};
     } else if (CLIENT && DEV) {
         webpackConfig.entry = {
-            app: [
+            [config.build.outputName]: [
                 `webpack-hot-middleware/client?path=${getDevPath()}__webpack_hmr`,
                 entry
             ]
         };
     } else if (CLIENT) {
         webpackConfig.entry = {
-            app: [
+            [config.build.outputName]: [
                 entry
             ]
         };
@@ -131,18 +131,14 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     } else {
         webpackConfig.output = {
             path: outputPath,
-            publicPath: DIST ? '/' : getDevPath(config.build.outputPath[target]),
-            filename: (DIST && CLIENT) ? '[name].[hash].js' : '[name].bundle.js',
-            chunkFilename: (DIST && CLIENT) ? '[name].[hash].js' : '[name].bundle.js'
+            publicPath: DIST ? config.path : getDevPath(),
+            filename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js',
+            chunkFilename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js'
         };
     }
 
     if (SERVER) {
         webpackConfig.output.libraryTarget = 'commonjs2';
-    }
-
-    if (CLIENT && DEV) {
-        webpackConfig.output.filename = '[name].client.bundle.js';
     }
 
     /**

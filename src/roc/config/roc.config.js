@@ -32,6 +32,7 @@ const config = {
         mode: 'dist',
         target: ['client', 'server'],
         entry: { client: 'src/client/index.js', server: 'src/server/index.js'},
+        outputName: 'app',
         outputPath: { client: 'build/client', server: 'build/server'},
         moduleBuild: false,
         moduleStyle: ''

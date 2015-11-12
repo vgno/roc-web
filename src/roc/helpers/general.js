@@ -19,8 +19,11 @@ let onceDevPort = true;
  */
 export function getDevPath(relativeBuildPath = '') {
     const devIp = devip() ? devip()[0] : 'localhost';
+    const buildPath = relativeBuildPath && relativeBuildPath.slice(-1) !== '/' ?
+        relativeBuildPath + '/' :
+        relativeBuildPath;
 
-    return `http://${devIp}:${getDevPort()}/${relativeBuildPath}`;
+    return `http://${devIp}:${getDevPort()}/${buildPath}`;
 }
 
 /**

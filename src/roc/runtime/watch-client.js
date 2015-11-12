@@ -28,7 +28,8 @@ export default function watchClient(compiler) {
 
         server.use(
             koaWebpackDevMiddleware(compiler, {
-                publicPath: compiler.options.output.publicPath,
+                // Let the publicPath be / since we want it to be based on the root of the dev server
+                publicPath: '/',
                 noInfo: config.dev.devMiddleware.noInfo,
                 quiet: config.dev.devMiddleware.quiet
             })
