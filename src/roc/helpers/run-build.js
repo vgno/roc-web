@@ -95,7 +95,9 @@ const build = (createBuilder, target, config) => {
  *
  * Helper for building an application.
  *
- * @param {!object} rocExtension - The Roc Extension to use when building
+ * If a {@link createBuilder} has been defined in `roc.config.js` it will use that over the provided one.
+ *
+ * @param {{createBuilder: function}} rocExtension - The Roc Extension to use when building, see {@link createBuilder}
  * @param {string} [appConfigPath] - A path to a `roc.config.js` file that should be used
  * @param {object} [tempConfig] - A configuration object that should be used
  */
@@ -106,7 +108,9 @@ export default function runBuild({ createBuilder }, appConfigPath = '', tempConf
 
     const applicationConfig = getApplicationConfig();
     if (applicationConfig.createBuilder) {
+        /* eslint-disable no-console */
         console.log(colors.cyan(`Using the 'createBuilder' defined in the configuration file.\n`));
+        /* eslint-enable */
         createBuilder = applicationConfig.createBuilder;
     }
 

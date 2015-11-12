@@ -11,6 +11,7 @@ import { getApplicationConfigPath, getTemporaryConfig } from 'roc-config';
 import { getDevPort, getPort } from '../helpers/general';
 import { getConfig } from '../helpers/config';
 import { parseStats } from '../builder/utils/stats';
+
 /**
  * Server watcher.
  *

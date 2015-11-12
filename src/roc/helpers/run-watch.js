@@ -50,7 +50,10 @@ const createWatcher = (config, target, createBuilder, watcher) => {
  *
  * Helper for starting an application in watch mode.
  *
- * @param {!object} rocExtension - The Roc Extension to use when starting the watcher
+ * If a {@link createBuilder} has been defined in `roc.config.js` it will use that over the provided one.
+ *
+ * @param {!{createBuilder: function, watchClient: function, watchServer: function}} rocExtension -
+ * The Roc Extension to use when starting the watcher, see {@link createBuilder} {@link watchClient} {@link watchServer}
  * @param {string} [appConfigPath] - A path to a `roc.config.js` file that should be used
  * @param {object} [tempConfig] - A configuration object that should be used
  */
