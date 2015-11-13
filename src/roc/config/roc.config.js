@@ -7,6 +7,7 @@ const config = {
         'build/client'
     ],
     favicon: '',
+    path: '/',
 
     dev: {
         debug: 'roc:*',
@@ -29,6 +30,7 @@ const config = {
     },
 
     build: {
+        verbose: true,
         mode: 'dist',
         target: ['client', 'server'],
         entry: { client: 'src/client/index.js', server: 'src/server/index.js'},

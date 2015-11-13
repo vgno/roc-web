@@ -29,22 +29,25 @@ const handleCompletion = (results) => {
     }
 };
 
-const handleError = (error) => {
-    console.log(colors.red('\nBuild failed!\n'));
+const handleError = (verbose) => (error) => {
+    const errorMessage = error.target ? ' for ' + colors.bold(error.target) : '';
 
-    if (error.target) {
-        console.log('\n' + error.target);
-    }
+    console.log(colors.red(`\n\nBuild failed${errorMessage}\n`));
+
     console.log(colors.red(error.message));
-    console.log(error.stack);
 
+    if (verbose) {
+        console.log(error.stack);
+    } else {
+        console.log('\nRun with debug for more output.\n');
+    }
     /* eslint-disable no-process-exit */
     // Make sure we do not continue trying to build other targets since we need everything to complete
     process.exit(1);
     /* eslint-enable */
 };
 
-const build = (createBuilder, target, config) => {
+const build = (createBuilder, target, config, verbose) => {
     return new Promise((resolve, reject) => {
         clean(config.build.outputPath[target])
             .then(() => {
@@ -75,7 +78,8 @@ const build = (createBuilder, target, config) => {
                     }
 
                     // FIXME Handle this better
-                    const statsJson = stats.toJson();
+                    const options = verbose ? null : {errorDetails: false};
+                    const statsJson = stats.toJson(options);
                     if (statsJson.errors.length > 0) {
                         statsJson.errors.map(err => console.log(err));
                     }
@@ -116,8 +120,10 @@ export default function runBuild({ createBuilder }, appConfigPath = '', tempConf
 
     validate(config, metaConfig);
 
-    const promises = config.build.target.map((target) => build(createBuilder, target, config));
+    const verbose = config.build.verbose;
+
+    const promises = config.build.target.map((target) => build(createBuilder, target, config, verbose));
     Promise.all(promises)
         .then(handleCompletion)
-        .catch(handleError);
+        .catch(handleError(verbose));
 }
