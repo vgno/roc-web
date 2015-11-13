@@ -8,6 +8,7 @@ const config = {
     ],
     favicon: '',
     path: '/',
+    startBundle: '',
 
     dev: {
         debug: 'roc:*',
