@@ -34,34 +34,41 @@ server.start();
 The application can be configured through the use of a `roc.config.js` file as well as setting options in the functions. Please look at the JSDoc for the complete interface.
 
 ### roc.config.js
-This is the default configuration that will be used if not overridden as either options in functions, like above, or creating a `roc.config.js` from where the application is started, the application root.
-```javascript
-export default {
-    // Port for the server to use.
-    port: 3000,
-    debug: {
-        // The level of debug messages that should be shown for the server, see https://www.npmjs.com/package/debug
-        server: 'roc:*'
-    },
-    // What folder the server should expose.
-    serve: [],
-    // Path to the favicon file, specially handled on the server.
-    favicon: '',
+`roc.config.js` is a powerful way to configure a Roc project. For one you can use it to override default configuration and also extend or override the builder used to create the application.
 
-    dev: {
-        // The level of debug messages that should be shown, see https://www.npmjs.com/package/debug
-        debug: 'roc:*',
-        // Port for the dev server, will need to be a free range of at least 3.
-        port: 3001,
-        // Files/folders that should trigger a restart of the server.
-        watch: [
-            'config/',
-            'roc.config.js'
-        ],
-        // If Browsersync should reload the browser when the server is rebuilt.
-        reloadOnServerChange: false,
-        // If Browsersync should open the server when it has started
-        open: false
+#### Configuration
+By default all Roc extensions can add configuration options that will be used throughout their internal code. Most often they also define sane defaults for this configuration but sometimes one will want to fine tune them or it's expected that the user should provide something. This can be done by providing a `config` object from the `roc.config.js` file that matches the options in the extension.
+
+The best way currently to see what options are available is to look at the `roc.config.js` file that contains the defaults and it's associated `roc.config.meta.js` containing descriptions on what the different options do. Both of these files can be found in `src/roc/config`. It is also possible to use the Roc CLI to list the available options, their defaults and descriptions. You do this by running either `$ roc dev --help` or `$ roc build --help`.
+
+__Example__
+```js
+modules.exports = {
+    config: {
+        port: 80
+    }
+};
+```
+
+#### Builder
+It is possible to override and extend the builder implemented in a Roc extension that is used by the Roc CLI. This could be useful for adding some extra logic to the build or by manually merging two Roc extensions together.
+
+To do this you will need to define a `createBuilder` function that is exported from `roc.config.js`. This should follow the same interface as normal, please see the documentation for this.
+
+__Example__
+```js
+const rocWebBuilder = require('roc-web'.createBuilder);
+modules.exports = {
+    createBuilder: function(target) {
+        const { buildConfig, builder } = rocWebBuilder(target);
+
+        // Extend the buildConfig in some way possibly
+        // …
+
+        return {
+            buildConfig,
+            builder
+        };
     }
 };
 ```
