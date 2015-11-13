@@ -47,7 +47,7 @@ modules.exports = {
     config: {
         port: 80
     }
-}
+};
 ```
 
 #### Builder
@@ -68,9 +68,9 @@ modules.exports = {
         return {
             buildConfig,
             builder
-        }
+        };
     }
-}
+};
 ```
 
 ### Important
