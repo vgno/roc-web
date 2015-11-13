@@ -6,6 +6,7 @@ const configMeta = {
     serve: 'What folder the server should expose',
     favicon: 'Path to the favicon file, specially handled on the server',
     path: 'The basepath for the application',
+    startBundle: 'Relative path to a bundle to start when calling "start", will not be needed in most cases',
 
     dev: {
         debug: 'Filter for debug messages that should be shown for the server, see https://www.npmjs.com/package/debug',

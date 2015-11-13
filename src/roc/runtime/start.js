@@ -15,6 +15,7 @@ export default function start(artifact) {
     debug.enable(config.dev.debug);
 
     artifact = artifact ||
+        config.startBundle && path.join(process.cwd(), config.startBundle) ||
         path.join(process.cwd(), config.build.outputPath.server, `${config.build.outputName}.roc.js`);
 
     debug('roc:start')(`Starting Roc application…`);
