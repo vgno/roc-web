@@ -1,7 +1,7 @@
 {
   "name": "roc-web",
   "version": "1.0.0-alpha1",
-  "description": "Web base for Roc Applications",
+  "description": "Web base extension for Roc Applications",
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src/roc --out-dir lib --source-maps",
@@ -9,6 +9,10 @@
     "lint": "eslint .",
     "check": "ncu",
     "docs": "esdoc -c esdoc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vgno/roc-web.git"
   },
   "devDependencies": {
     "babel": "~5.8.23",
@@ -24,7 +28,7 @@
   },
   "roc": "1.0.0-alpha1",
   "author": "VG",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "dependencies": {
     "autoprefixer": "~6.0.3",
     "babel-loader": "~5.3.2",
