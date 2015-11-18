@@ -1,3 +1,5 @@
+import { isInteger, isString, isBoolean, isPath, isArray, isArrayOrSingle } from 'roc-config/validators';
+
 const configMeta = {
     descriptions: {
         port: 'Port for the server to use',
@@ -42,8 +44,53 @@ const configMeta = {
             moduleBuild: 'NOT IMPLEMENTED YET',
             moduleStyle: 'NOT IMPLEMENTED YET'
         }
+    },
+
+    validation: {
+        port: isInteger,
+        debug: {
+            server: isString
+        },
+        serve: isArrayOrSingle(isPath),
+        favicon: isString,
+        path: isPath,
+        startBundle: isPath,
+
+        dev: {
+            debug: isString,
+            port: isInteger,
+            watch: isArrayOrSingle(isPath),
+            reloadOnServerChange: isBoolean,
+            open: isBoolean,
+            devMiddleware: {
+                noInfo: isBoolean,
+                quiet: isBoolean
+            },
+            hotMiddleware: {
+                reload: isBoolean,
+                noInfo: isBoolean,
+                quiet: isBoolean
+            }
+        },
+
+        build: {
+            verbose: isBoolean,
+            mode: /^dev|dist|test$/i,
+            target: isArray(/^client|server$/i),
+            entry: {
+                client: isPath,
+                server: isPath
+            },
+            outputName: isString,
+            outputPath: {
+                client: isPath,
+                server: isPath
+            }
+        }
     }
 };
+
+
 
 /**
  * Exports the `roc.config.meta.js`.
