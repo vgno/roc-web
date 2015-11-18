@@ -22,9 +22,7 @@
     "mocha": "~2.3.3",
     "npm-check-updates": "~2.3.4"
   },
-  "roc": {
-      "cli": "1.0.0-alpha1"
-  },
+  "roc": "1.0.0-alpha1",
   "author": "VG",
   "license": "UNLICENSED",
   "dependencies": {
