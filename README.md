@@ -88,6 +88,4 @@ When creating an application based on __roc-web__ one can use the node dependenc
 _For a complete list look at the `package.json` in the root of this project._
 
 ## Extend
-To create an roc extension on top of __roc-web__ one needs to extend the API.
-
-_More to be added here…_
+To create an roc extension on top of __roc-web__ one needs to extend the API. More information will be added here but for now one can look at the ESDocs.

@@ -1,15 +1,21 @@
 {
   "name": "roc-web",
-  "version": "1.0.0-alpha1",
+  "version": "1.0.0-alpha3",
   "description": "Web base extension for Roc Applications",
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src/roc --out-dir lib --source-maps",
-    "test": "mocha test/",
+    "clean": "rimraf lib docs",
+    "test": "npm run lint && npm run mocha",
+    "mocha": "mocha test/",
     "lint": "eslint .",
     "check": "ncu",
-    "docs": "esdoc -c esdoc.json"
+    "docs": "esdoc -c esdoc.json",
+    "prepublish": "npm run lint && npm run clean && npm run build && npm run docs && npm run mocha"
   },
+  "keywords": [
+    "roc"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/vgno/roc-web.git"
@@ -24,9 +30,10 @@
     "eslint": "~1.7.3",
     "eslint-config-vgno": "~4.0.1",
     "mocha": "~2.3.3",
-    "npm-check-updates": "~2.3.4"
+    "npm-check-updates": "~2.3.4",
+    "rimraf": "~2.4.3"
   },
-  "roc": "1.0.0-alpha1",
+  "roc": "1.0.0-alpha3",
   "author": "VG",
   "license": "MIT",
   "dependencies": {
@@ -61,7 +68,7 @@
     "postcss-loader": "~0.7.0",
     "prettysize": "0.0.3",
     "rimraf": "~2.4.3",
-    "roc-config": "1.0.0-alpha1",
+    "roc-config": "*",
     "sass-loader": "~3.0.0",
     "source-map-support": "~0.3.3",
     "style-loader": "~0.13.0",

@@ -1,0 +1,7 @@
+examples
+test
+src/*
+!src/app/
+!src/module/
+.*
+esdoc.json

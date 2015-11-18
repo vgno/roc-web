@@ -6,7 +6,7 @@ import MultiProgress from 'multi-progress';
 import pretty from 'prettysize';
 import colors from 'colors/safe';
 
-import { setApplicationConfig, getApplicationConfig, setTemporaryConfig, validate } from 'roc-config';
+import { setApplicationConfigPath, getRawApplicationConfig, appendConfig, validate } from 'roc-config';
 
 import clean from '../builder/utils/clean';
 import { getConfig, metaConfig } from '../helpers/config';
@@ -106,16 +106,16 @@ const build = (createBuilder, target, config, verbose) => {
  * @param {object} [tempConfig] - A configuration object that should be used
  */
 export default function runBuild({ createBuilder }, appConfigPath = '', tempConfig = {}) {
-    setApplicationConfig(appConfigPath);
-    setTemporaryConfig(tempConfig);
+    setApplicationConfigPath(appConfigPath);
+    appendConfig(tempConfig);
     const config = getConfig();
 
-    const applicationConfig = getApplicationConfig();
-    if (applicationConfig.createBuilder) {
+    const rawApplicationConfig = getRawApplicationConfig();
+    if (rawApplicationConfig.createBuilder) {
         /* eslint-disable no-console */
         console.log(colors.cyan(`Using the 'createBuilder' defined in the configuration file.\n`));
         /* eslint-enable */
-        createBuilder = applicationConfig.createBuilder;
+        createBuilder = rawApplicationConfig.createBuilder;
     }
 
     /* eslint-disable no-console */
