@@ -41,10 +41,10 @@
  *
  * Used in {@link createServer}.
  *
- * Both of this options can also be set in `roc.config.js` however these values will override them if provided.
+ * Both of these options can also be set in `roc.config.js` however these values will override them if provided.
  *
  * @typedef {Object} rocServerOptions
- * @property {string|string[]} [serve] - The folders to serve from the server. Paths should be based from where the
+ * @property {string|string[]} [serve] - The folders to serve from the server. Paths will be based from where the
  * application is started.
- * @property {string} [favicon] - The path to the favicon. This file will be handeled in the server in a special way.
+ * @property {string} [favicon] - The path to the favicon. This file will be handled in the server in a special way.
  */

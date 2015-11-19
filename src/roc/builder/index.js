@@ -181,26 +181,32 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         loader: 'babel-loader',
         include: function(absPath) {
             /* This function will look at the absolute path for the current file
-             * to determine if it should be processed by the babel-loader.
+             * to determine if it should be processed by babel-loader.
              *
-             * What this does exactly is that is finds the last match of "roc-X/SOMETHING".
+             * What this does exactly is that it finds the last match of "roc-X/SOMETHING".
              * If SOMETHING is "node_modules" it will ignore it otherwise process it using
-             * babel.
+             * babel. Additionally if there is a match for node_modules in general after that
+             * check it will ignore that as well.
              */
-            const regexp = /(roc-[^/]*)\/([^/]*)/g;
+            const regexp = /(node_modules)|(roc-[^/]*)\/([^/]*)/g;
             let match, matches = [];
             while ((match = regexp.exec(absPath))) {
                 matches.push({ roc: match[0], next: match[1] });
             }
             const last = matches[matches.length - 1];
             if (last && last.next !== 'node_modules') {
-                // We want to process this with babel-loader
+                // We want to process this with babel-loader.
+                // This is something in a roc module.
+                // Would like to avoid this, see issue https://github.com/webpack/webpack/issues/1071
+                return true;
+            } else if (!last) {
+                // No match for node_modules, we will include this path.
                 return true;
             }
-        },
-        exclude: [
-            /node_modules/
-        ]
+
+            // We should come here in the case that there is a node_modules in the path
+            return false;
+        }
     };
 
     if (!TEST) {

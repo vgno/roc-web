@@ -3,7 +3,7 @@ import path from 'path';
 import colors from 'colors/safe';
 import mkdirp from 'mkdirp';
 
-import { setApplicationConfig, getApplicationConfig, setTemporaryConfig, validate } from 'roc-config';
+import { setApplicationConfigPath, getRawApplicationConfig, appendConfig, validate } from 'roc-config';
 
 import clean from '../builder/utils/clean';
 import { getConfig, metaConfig, baseConfig } from '../helpers/config';
@@ -63,8 +63,8 @@ export default function runWatch({ createBuilder, watchClient, watchServer }, ap
         server: watchServer
     };
 
-    setApplicationConfig(appConfigPath);
-    setTemporaryConfig(tempConfig);
+    setApplicationConfigPath(appConfigPath);
+    appendConfig(tempConfig);
 
     let config = getConfig();
 
@@ -77,16 +77,16 @@ export default function runWatch({ createBuilder, watchClient, watchServer }, ap
             /* eslint-enable */
         }
 
-        setTemporaryConfig({build: {mode: 'dev'}});
+        appendConfig({build: {mode: 'dev'}});
         config = getConfig();
     }
 
-    const applicationConfig = getApplicationConfig();
-    if (applicationConfig.createBuilder) {
+    const rawApplicationConfig = getRawApplicationConfig();
+    if (rawApplicationConfig.createBuilder) {
         /* eslint-disable no-console */
         console.log(colors.cyan(`Using the 'createBuilder' defined in the configuration file.\n`));
         /* eslint-enable */
-        createBuilder = applicationConfig.createBuilder;
+        createBuilder = rawApplicationConfig.createBuilder;
     }
 
     validate(config, metaConfig);
