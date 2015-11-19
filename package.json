@@ -45,6 +45,7 @@
     "colors": "~1.1.2",
     "config": "~1.16.0",
     "css-loader": "~0.21.0",
+    "debug": "~2.2.0",
     "deep-assign": "~2.0.0",
     "dev-ip": "~1.0.1",
     "extract-text-webpack-plugin": "~0.8.2",
@@ -73,6 +74,7 @@
     "source-map-support": "~0.3.3",
     "style-loader": "~0.13.0",
     "url-loader": "~0.5.6",
-    "webpack": "~1.12.2"
+    "webpack": "~1.12.2",
+    "webpack-hot-middleware": "2.x"
   }
 }
