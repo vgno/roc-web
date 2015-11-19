@@ -33,7 +33,7 @@
     "npm-check-updates": "~2.3.4",
     "rimraf": "~2.4.3"
   },
-  "roc": "1.0.0-alpha3",
+  "roc": "1.0.0-alpha4",
   "author": "VG",
   "license": "MIT",
   "dependencies": {
