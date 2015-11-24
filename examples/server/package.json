@@ -9,6 +9,6 @@
     "dev": "roc dev --buildTarget server --buildEntryServer index.js"
   },
   "dependencies": {
-    "roc-web": "1.0.0-alpha1"
+    "roc-web": "*"
   }
 }

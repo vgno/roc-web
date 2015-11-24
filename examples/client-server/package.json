@@ -6,6 +6,6 @@
   "author": "VG",
   "license": "Unlicensed",
   "dependencies": {
-    "roc-web": "1.0.0-alpha1"
+    "roc-web": "*"
   }
 }
