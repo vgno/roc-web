@@ -2,13 +2,13 @@
   "name": "roc-web-server-example",
   "version": "1.0.0-alpha1",
   "description": "Roc Web server example",
-  "roc": "1.0.0-alpha1",
+  "roc": "1.0.0-alpha5",
   "author": "VG",
   "license": "Unlicensed",
   "scripts": {
     "dev": "roc dev --buildTarget server --buildEntryServer index.js"
   },
   "dependencies": {
-    "roc-web": "1.0.0-alpha1"
+    "roc-web": "*"
   }
 }
