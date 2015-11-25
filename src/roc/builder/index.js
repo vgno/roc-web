@@ -92,7 +92,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
                 ['roc-web/lib/helpers/config']: true
             },
             function(context, request, callback) {
-                const regexp = /roc-.*\/(.+)/;
+                const regexp = /roc-[^\/]+\/([^\/]+)/;
                 const match = regexp.exec(request);
 
                 // If a roc module include it if app is the next on the path
