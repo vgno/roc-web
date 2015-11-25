@@ -2,14 +2,14 @@
 ![stability alpha](https://img.shields.io/badge/stability-alpha-red.svg)
 [![roc](https://img.shields.io/npm/v/roc-web.svg)](https://www.npmjs.com/package/roc-web)
 
-Base extension for simple web applications built with Roc. Uses mainly __Koa__ and __Webpack__ internally.
+Base extension for simple web applications built with Roc. Uses mainly [Koa](http://koajs.com) and [Webpack](https://webpack.github.io) internally.
 
 ## How to build an application
-First make sure to install `roc` by `npm install -g roc` and then following the main steps at [Basic web application](https://github.com/vgno/roc#basic-web-application)
+First make sure to install `roc` by `npm install -g roc` and then following the main steps at [Basic web application](https://github.com/vgno/roc#basic-web-application).
 
 After these steps you should have `roc` available globally and be in the directory of your newly generated project that uses `roc-web`.
 
-When creating an application based on __roc-web__ you use `createServer` API. It returns an object that has a start method on it that can be invoked to run the application.
+When creating an application based on `roc-web` you use `createServer` API. It returns an object that has a start method on it that can be invoked to run the application.
 
 ### Simple Example
 ```javascript
@@ -77,11 +77,10 @@ modules.exports = {
 There are some examples in `examples/` that shows how `roc-web` can be used directly. To test them out you will need to run `npm link` to connect them to your checked out version of `roc-web`.
 
 1. Run `npm install` in the base of `roc-web`.
-2. Run `npm build` in the base of `roc-web`.
-3. Run `npm link` in the base of `roc-web`.
-4. Run npm run build -- --watch in the base of `roc-web`.
-5. Go to the example you want and run `npm link roc-web`.
-6. Using the `roc-cli` run `roc dev` to get started. Some example may need some extra parameters set to `roc-dev`
+2. Run `npm link` in the base of `roc-web`.
+3. Run npm run build -- --watch in the base of `roc-web`.
+4. Go to the example you want and run `npm link roc-web`.
+5. Using the `roc-cli` run `roc dev` to get started. Some example may need some extra parameters set to `roc-dev`
 
 ### Exposes
 When creating an application based on __roc-web__ one can use the node dependencies used in this project. This means that you can import them as you would do if you had installed them inside your application.
