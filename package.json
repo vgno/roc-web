@@ -1,6 +1,6 @@
 {
   "name": "roc-web",
-  "version": "1.0.0-alpha4",
+  "version": "1.0.0-alpha6",
   "description": "Web base extension for Roc Applications",
   "main": "lib/index.js",
   "scripts": {
