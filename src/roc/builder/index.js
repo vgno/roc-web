@@ -92,8 +92,12 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
                 ['roc-web/lib/helpers/config']: true
             },
             function(context, request, callback) {
-                // If a roc module include it in the bundle
-                if (request.substr(0, 4) === 'roc-') {
+                const regexp = /roc-[^\/]+\/([^\/]+)/;
+                const match = regexp.exec(request);
+
+                // If a roc module include it if app is the next on the path
+                // Will include for example "roc-web/app" & "roc-web-react/app/server" but not "roc-web/lib" & "roc-web"
+                if (match && match[1] === 'app') {
                     return callback();
                 }
 
