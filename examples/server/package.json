@@ -2,7 +2,7 @@
   "name": "roc-web-server-example",
   "version": "1.0.0-alpha1",
   "description": "Roc Web server example",
-  "roc": "1.0.0-alpha5",
+  "roc": "1.0.0-alpha6",
   "author": "VG",
   "license": "Unlicensed",
   "scripts": {
