@@ -79,9 +79,9 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     }
 
     if (CLIENT) {
-        const makeAllPathsGlobal = (input) => input.map((elem) => getAbsolutePath(elem));
+        const makeAllPathsAbsolute = (input) => input.map((elem) => getAbsolutePath(elem));
 
-        const assets = makeAllPathsGlobal(config.build.assets);
+        const assets = makeAllPathsAbsolute(config.build.assets);
         webpackConfig.entry[config.build.outputName] = webpackConfig.entry[config.build.outputName].concat(assets);
     }
 
