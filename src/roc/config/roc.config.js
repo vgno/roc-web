@@ -31,6 +31,7 @@ const config = {
     },
 
     build: {
+        assets: [],
         verbose: true,
         mode: 'dist',
         target: ['client', 'server'],

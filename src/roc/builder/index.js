@@ -78,6 +78,13 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         };
     }
 
+    if (CLIENT) {
+        const makeAllPathsGlobal = (input) => input.map((elem) => getAbsolutePath(elem));
+
+        const assets = makeAllPathsGlobal(config.build.assets);
+        webpackConfig.entry[config.build.outputName] = webpackConfig.entry[config.build.outputName].concat(assets);
+    }
+
     /**
     * Target
     */
@@ -217,9 +224,53 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         webpackConfig.module.loaders.push(jsLoader);
     }
 
+    const getScssLoader = (base = 'css-loader', modules = false) => {
+        let moduleSettings = '';
+        if (modules) {
+            moduleSettings = '&module&localIdentName=';
+
+            // Define how the class names should be defined
+            if (DIST) {
+                moduleSettings += '[hash:base64:5]';
+            } else {
+                moduleSettings += '[path]_[name]__[local]___[hash:base64:5]';
+            }
+        }
+
+        return `${base}?sourceMap?importLoaders=2${moduleSettings}` +
+        '!postcss!sass?sourceMap&' +
+        'includePaths[]=' + bourbon + '&' +
+        'includePaths[]=' + neat;
+    };
+
+    const flattenAssetsStyles = (input, regexp) => {
+        return input.reduce((prev, curr) => {
+            if (regexp.test(curr)) {
+                return prev.concat(getAbsolutePath(curr));
+            }
+            return prev;
+        }, []);
+    };
+
+    const scssStyles = flattenAssetsStyles(config.build.assets, /\.scss$/);
+
+    // GLOBAL STYLE LOADER
+    const globalStyleLoader = {
+        test: (absPath) => {
+            if (scssStyles.indexOf(absPath) !== -1) {
+                return true;
+            }
+        },
+        loader: ExtractTextPlugin.extract('style', getScssLoader())
+    };
+
     // STYLE LOADER
     const styleLoader = {
-        test: /\.scss$/
+        test: (absPath) => {
+            if (scssStyles.indexOf(absPath) === -1 && /\.scss$/.test(absPath)) {
+                return true;
+            }
+        }
     };
 
     // JSON LOADER
@@ -234,19 +285,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         styleLoaders += '/locals';
     }
 
-    styleLoaders += '?sourceMap&module&importLoaders=1&localIdentName=';
-
-    // Define how the class names should be defined
-    if (DIST) {
-        styleLoaders += '[hash:base64:5]';
-    } else {
-        styleLoaders += '[path]_[name]__[local]___[hash:base64:5]';
-    }
-
-    // We can add an external sass dependecie here.
-    styleLoaders += '!postcss!sass?sourceMap&' +
-    'includePaths[]=' + bourbon + '&' +
-    'includePaths[]=' + neat;
+    styleLoaders = getScssLoader(styleLoaders, true);
 
     if (CLIENT) {
         styleLoaders = ExtractTextPlugin.extract('style', styleLoaders);
@@ -255,6 +294,10 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     styleLoader.loader = styleLoaders;
 
     webpackConfig.module.loaders.push(styleLoader);
+
+    if (CLIENT) {
+        webpackConfig.module.loaders.push(globalStyleLoader);
+    }
 
     // Post CSS webpackConfig
     webpackConfig.postcss = [

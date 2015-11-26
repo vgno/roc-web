@@ -1,4 +1,11 @@
-import { isInteger, isString, isBoolean, isPath, isArray, isArrayOrSingle } from 'roc-config/validators';
+import {
+    isInteger,
+    isString,
+    isBoolean,
+    isPath,
+    isArray,
+    isArrayOrSingle
+} from 'roc-config/validators';
 
 const configMeta = {
     descriptions: {
@@ -29,6 +36,7 @@ const configMeta = {
         },
 
         build: {
+            assets: 'An array of files to include into the build process',
             verbose: 'If verbose mode should be used, returns more output during build',
             mode: 'What mode the application should be built for. Possible values are "dev", "dist" and "test"',
             target: 'For what target the application should be built for. Possible values are "client" and "server"',
@@ -74,6 +82,7 @@ const configMeta = {
         },
 
         build: {
+            assets: isArray(isPath),
             verbose: isBoolean,
             mode: /^dev|dist|test$/i,
             target: isArray(/^client|server$/i),
