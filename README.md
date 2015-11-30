@@ -1,6 +1,11 @@
 # roc-web
 ![stability alpha](https://img.shields.io/badge/stability-alpha-red.svg)
 [![roc](https://img.shields.io/npm/v/roc-web.svg)](https://www.npmjs.com/package/roc-web)
+[![build status](https://travis-ci.org/vgno/roc-web.svg)](https://travis-ci.org/vgno/roc-web)
+[![Coverage Status](https://coveralls.io/repos/vgno/roc-web/badge.svg?branch=master&service=github)](https://coveralls.io/github/vgno/roc-web?branch=master)
+[![Code Climate](https://codeclimate.com/github/vgno/roc-web/badges/gpa.svg)](https://codeclimate.com/github/vgno/roc-web)
+[![Issue Count](https://codeclimate.com/github/vgno/roc-web/badges/issue_count.svg)](https://codeclimate.com/github/vgno/roc-web)
+[![Dependency Status](https://david-dm.org/vgno/roc-web.svg)](https://david-dm.org/vgno/roc-web)
 
 Base extension for simple web applications built with Roc. Uses mainly [Koa](http://koajs.com) and [Webpack](https://webpack.github.io) internally.
 

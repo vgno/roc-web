@@ -5,13 +5,16 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src/roc --out-dir lib --source-maps",
+    "build:watch": "npm run build -- --watch",
     "clean": "rimraf lib docs",
-    "test": "npm run lint && npm run mocha",
-    "mocha": "mocha test/",
+    "test": "npm run lint && npm run test:coverage",
+    "test:unit": "mocha --compilers js:babel/register --recursive test/",
+    "test:unit:watch": "npm run test:unit -- --watch",
+    "test:coverage": "babel-node ./node_modules/.bin/isparta cover _mocha -- --recursive test/",
     "lint": "eslint .",
     "check": "ncu",
     "docs": "esdoc -c esdoc.json",
-    "prepublish": "npm run lint && npm run clean && npm run build && npm run docs && npm run mocha"
+    "prepublish": "npm run lint && npm run clean && npm run build && npm run docs && npm run test:unit"
   },
   "keywords": [
     "roc"
@@ -30,6 +33,10 @@
     "eslint": "~1.7.3",
     "eslint-config-vgno": "~4.0.1",
     "mocha": "~2.3.3",
+    "isparta": "~3.5.3",
+    "codacy-coverage": "~1.1.3",
+    "codeclimate-test-reporter": "~0.1.1",
+    "coveralls": "~2.11.4",
     "npm-check-updates": "~2.3.4"
   },
   "roc": "1.0.0-alpha6",
