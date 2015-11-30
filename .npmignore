@@ -5,3 +5,4 @@ src/*
 !src/module/
 .*
 esdoc.json
+coverage
