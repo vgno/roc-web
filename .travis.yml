@@ -8,6 +8,8 @@ deploy:
         secure: YHBmPTw1xxAdq2iWDYt1uiPzxlA16CG+2iYuQiSQD9B2A0kuweuE2uquw1bi7EZfOcYGkVcVugOTuTvqI5mzaLoMsdzGDQGMuOLzPprO2LVEniB4FrTlIOLygY8DEZ/UVejP2kzLHly0Y/x7N70coRAavKlLHzHuRPvl5KFWmBi3FbPvXuhC4yt3AlW1+QZLs12jDcDYLnZx/seXBHMlkqh1ZFmNUQHFFperlfVhaRub3Q1Fqn8J8HFsIwMP7ayZDBra+QVeCCCE6X6PU9xuJcdtAwbzbuoUk4EEX5YPm7FdzeAlEZUlqbQMw2bGnmIQmDQDV9hPAS1jm/eNEotafFCnVGnjMzqK5GLWKega2RW0r3YgNf6xWzGoKzyz0seccZA42O3KWEFTAM1Wp3V9zl6IL7X3b5kerP24gn5JF1EYKT1+SX3us9+5GaAjCNjxNuK4s80ZvfElZiOYiMrud/wO1ZDMHC+Ryzw9dWpDvd0P/QnaGr4thC16Fw/krv2OnMSyrD+8wYCylM88yqauzBADz4xI5WW3Tblbyhe7Dcli/c//goEOdOhxcukgicA8eInp3pLGhD+DFXRQOz9dImPoVtHF/09dq6yKMvHyeaqVtYGccvBbfwvhtjVy4rIXPdsQhioGlhrybQjpuuPH9F4thf/I70O4VfQcrc1t58c=
     on:
         tags: true
+install:
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 addons:
     code_climate:
         repo_token:
