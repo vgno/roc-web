@@ -12,7 +12,6 @@ addons:
     code_climate:
         repo_token:
             secure: H4GNbiAamrWr6GZlJkKti46hGWIMj7joVYQbYuryeKHdzL0tlSlZTP+/LzAUdMb7F6IRF79CbvrAGnETcrF2R0jtGfuHZtrMQpQ4yIhUqa6W9AdEg20mLkqTp0Y6iQisd/RtntmIFzkouIbbW4gf7MJu7yEhNcol2rrUiRgoP9sPbTqx3Kmr3KKZGmk55piiP5Nv+4+aariu9sGYJAcipmBd6KxBEPqSFyzLsPjmHCaI8l5ITNMeRHysiNhDJL9MOs31ctHbMroN7n9sAjAneVVjZ1H6eQK9gSz+Dzsg+TbeEGLH9TJkpEHn09PXSs2knn/s9dRnP0C9f/uvkLEj1rB6X8AVLyaFPkR1KqJBHPgotJ8kqeLY62OlRLEJdc7b7kgLtwZJwRKYS5AObncDOn5Ts+7n2n55VSls9UH/3b5a3BsllfPI875XUc+Jm3vxCA06iQ0avU8JtO15XXF1LunJkvYcEfhKJFBWhIXPoll64EDVG6tFrmEd+ApeiG/0EliAN17qTzOOtjoru/rJonyy0/DIxY3O2tFX5YQWYaEUU5oxsyFgl9Jp1xa68OvBW1jDeHHETPJmbfC6wpjg1ZF3t1XM9uFZk2rCP3FeYQZKjmDqESLe4Tqlz3SM5Hep414abBRIq8HPOmZtPbG+amgYlHxddr3z3r3OAGHsDzk=
-addons:
     apt:
         sources:
             - ubuntu-toolchain-r-test
