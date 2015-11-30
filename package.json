@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src/roc --out-dir lib --source-maps",
+    "build:watch": "npm run build -- --watch",
     "clean": "rimraf lib docs",
     "test": "npm run lint && npm run test:coverage",
     "test:unit": "mocha --compilers js:babel/register --recursive test/",
