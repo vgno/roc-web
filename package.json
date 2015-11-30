@@ -9,7 +9,7 @@
     "clean": "rimraf lib docs",
     "test": "npm run lint && npm run test:coverage",
     "test:unit": "mocha --compilers js:babel/register --recursive test/",
-    "test:unit:watch": "mocha --watch --compilers js:babel/register --recursive test/",
+    "test:unit:watch": "npm run test:unit -- --watch",
     "test:coverage": "babel-node ./node_modules/.bin/isparta cover _mocha -- --recursive test/",
     "lint": "eslint .",
     "check": "ncu",
