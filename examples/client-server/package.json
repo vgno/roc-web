@@ -2,7 +2,7 @@
   "name": "roc-web-client-server-example",
   "version": "1.0.0-alpha1",
   "description": "Roc Web client & server example",
-  "roc": "1.0.0-alpha6",
+  "roc": "1.0.0-alpha8",
   "author": "VG",
   "license": "Unlicensed",
   "dependencies": {
