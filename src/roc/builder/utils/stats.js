@@ -35,24 +35,25 @@ export function writeStats(stats) {
  */
 export function parseStats(stats, publicPath = '') {
     // get chunks by name and extensions
-    const getChunks = (name, ext = 'js') => {
-        let chunk = stats.assetsByChunkName[name];
+    const getChunks = (ext = 'js', selectedChunk) => {
+        const filePath = selectedChunk ? '' : publicPath;
+        const chunks = selectedChunk ?
+            { [selectedChunk]: stats.assetsByChunkName[selectedChunk] } :
+            stats.assetsByChunkName;
 
-        // a chunk could be a string or an array, so make sure it is an array
-        if (!(Array.isArray(chunk))) {
-            chunk = [chunk];
-        }
+        return Object.keys(chunks).map((key) => {
+            if ((selectedChunk && chunks[selectedChunk]) || key !== 'manifest') {
+                return chunks[key].filter((chunkName) => path.extname(chunkName) === `.${ext}`)
+                    .map((chunkName) => filePath + chunkName);
+            }
 
-        return chunk
-            .filter((chunkName) => path.extname(chunkName) === `.${ext}`)
-            .map((chunkName) => publicPath + chunkName);
+            return [];
+        }).reduce((previous, current) => previous.concat(current), []);
     };
 
-    const script = getChunks('app', 'js');
-    const css = getChunks('app', 'css');
-
     return {
-        script,
-        css
+        manifest: getChunks('js', 'manifest'),
+        scripts: getChunks('js'),
+        styles: getChunks('css')
     };
 }

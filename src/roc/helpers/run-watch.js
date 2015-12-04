@@ -8,22 +8,32 @@ import { setApplicationConfigPath, getRawApplicationConfig, appendConfig, valida
 import clean from '../builder/utils/clean';
 import { getConfig, metaConfig, baseConfig } from '../helpers/config';
 
-const writeStatsFile = (buildPath, scriptPath) => {
+const writeStatsFile = (buildPath, scripts) => {
     fs.stat(buildPath, (err) => {
         if (err) {
             mkdirp.sync(buildPath);
         }
 
         fs.writeFileSync(path.join(buildPath, 'webpack-stats.json'), JSON.stringify({
-            script: [`${scriptPath}`],
-            css: ''
+            manifest: null,
+            scripts,
+            styles: null
         }));
     });
 };
 
-const startWatcher = (target, compiler, buildConfig, watcher, outputName) => {
+const startWatcher = (target, compiler, buildConfig, watcher) => {
     if (target === 'client') {
-        writeStatsFile(buildConfig.output.path, buildConfig.output.publicPath + outputName + '.roc.js');
+        let scripts = Object.keys(buildConfig.entry).map((entryName) =>
+            buildConfig.output.publicPath + entryName + '.roc.js');
+
+        scripts.push(buildConfig.output.publicPath + 'manifest.roc.js');
+        scripts.reverse();
+
+        writeStatsFile(
+            buildConfig.output.path,
+            scripts
+        );
     }
 
     return watcher[target](compiler);
@@ -34,7 +44,7 @@ const createWatcher = (config, target, createBuilder, watcher) => {
         .then(() => {
             const { buildConfig, builder } = createBuilder(target);
             const compiler = builder(buildConfig);
-            return startWatcher(target, compiler, buildConfig, watcher, config.build.outputName);
+            return startWatcher(target, compiler, buildConfig, watcher);
         })
         .catch((error) => {
             /* eslint-disable no-console */

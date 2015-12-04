@@ -159,7 +159,7 @@ export default function watchServer(compiler) {
 
             if (statsJson.assets && statsJson.assets.length > 0) {
                 const stats = parseStats(statsJson);
-                bundleName = stats.script[0];
+                bundleName = stats.scripts[0];
             }
 
             const artifact = path.join(compiler.outputPath, '/', bundleName);

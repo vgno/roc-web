@@ -143,8 +143,8 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         webpackConfig.output = {
             path: outputPath,
             publicPath: DIST ? config.path : getDevPath(),
-            filename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js',
-            chunkFilename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js'
+            filename: (DIST && CLIENT) ? '[name].[chunkhash].roc.js' : '[name].roc.js',
+            chunkFilename: (DIST && CLIENT) ? '[chunkhash].roc.js' : '[name].roc.js'
         };
     }
 
@@ -347,7 +347,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         );
     }
 
-    const styleName = COMPONENT_BUILD ? '[name].component.css' : '[name].[hash].css';
+    const styleName = COMPONENT_BUILD ? '[name].component.css' : '[name].[contenthash].css';
 
     webpackConfig.plugins.push(
         new ExtractTextPlugin(styleName, {
