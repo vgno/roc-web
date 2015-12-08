@@ -4,7 +4,7 @@
   "description": "Roc Web client & server example",
   "roc": "1.0.0-alpha8",
   "author": "VG",
-  "license": "Unlicensed",
+  "license": "MIT",
   "dependencies": {
     "roc-web": "*"
   }

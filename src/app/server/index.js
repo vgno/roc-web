@@ -1,16 +1,12 @@
-/* global __DIST__ */
+/* global USE_DEFAULT_KOA_MIDDLEWARES HAS_KOA_MIDDLEWARES KOA_MIDDLEWARES  */
 
 import debug from 'debug';
 import koa from 'koa';
-import helmet from 'koa-helmet';
 import serve from 'koa-static';
-import koaEtag from 'koa-etag';
-import koaCompressor from 'koa-compressor';
-import koaFavicon from 'koa-favicon';
-import koaAccesslog from 'koa-accesslog';
-import koaLogger from 'koa-logger';
 
-const config = require('roc-web/lib/helpers/config').getConfig();
+import { merge } from 'roc-config';
+
+const getConfig = require('roc-web/lib/helpers/config').getConfig;
 
 /**
  * Creates a server instance.
@@ -29,26 +25,16 @@ const config = require('roc-web/lib/helpers/config').getConfig();
  */
 export default function createServer(options = {}) {
     const server = koa();
+    const config = merge(getConfig(), options);
 
-    // Security headers
-    server.use(helmet());
-
-    server.use(koaEtag());
-
-    // We only enable gzip in dist
-    if (__DIST__) {
-        server.use(koaCompressor());
+    if (USE_DEFAULT_KOA_MIDDLEWARES) {
+        const middlewares = require('./middlewares')(config);
+        middlewares.forEach((middleware) => server.use(middleware));
     }
 
-    const favicon = options.favicon || config.favicon;
-    if (favicon) {
-        server.use(koaFavicon(favicon));
-    }
-
-    if (__DIST__) {
-        server.use(koaAccesslog());
-    } else {
-        server.use(koaLogger());
+    if (HAS_KOA_MIDDLEWARES) {
+        const middlewares = require(KOA_MIDDLEWARES)(config);
+        middlewares.forEach((middleware) => server.use(middleware));
     }
 
     const makeServe = (toServe = []) => {
@@ -59,7 +45,7 @@ export default function createServer(options = {}) {
     };
 
     // Serve folders
-    makeServe(options.serve || config.serve);
+    makeServe(config.serve);
 
     function start(port) {
         port = port || process.env.PORT || config.port;

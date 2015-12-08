@@ -39,7 +39,9 @@ const config = {
         outputName: 'app',
         outputPath: { client: 'build/client', server: 'build/server'},
         moduleBuild: false,
-        moduleStyle: ''
+        moduleStyle: '',
+        koaMiddlewares: 'koaMiddlewares.js',
+        useDefaultKoaMiddlewares: true
     }
 };
 
