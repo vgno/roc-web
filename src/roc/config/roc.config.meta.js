@@ -50,7 +50,11 @@ const configMeta = {
                 server: 'The output directory for the server build'
             },
             moduleBuild: 'NOT IMPLEMENTED YET',
-            moduleStyle: 'NOT IMPLEMENTED YET'
+            moduleStyle: 'NOT IMPLEMENTED YET',
+            koaMiddlewares: 'The koa middlewares to add to the server instance, will be added after the default ' +
+                ' middlewares',
+            useDefaultKoaMiddlewares: 'If Roc should use internally defined koa middlewares, please look at the ' +
+                ' documentation for what middlewares that are included'
         }
     },
 
@@ -94,7 +98,9 @@ const configMeta = {
             outputPath: {
                 client: isPath,
                 server: isPath
-            }
+            },
+            koaMiddlewares: isPath,
+            useDefaultKoaMiddlewares: isBoolean
         }
     }
 };

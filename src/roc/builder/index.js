@@ -1,5 +1,6 @@
 import 'source-map-support/register';
 
+import fs from 'fs';
 import webpack from 'webpack';
 import path from 'path';
 import autoprefixer from 'autoprefixer';
@@ -426,6 +427,35 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
             })
         );
     }
+
+    // TODO Refactor this into a common helper
+    const fileExists = (filepath) => {
+        filepath = getAbsolutePath(filepath);
+        try {
+            return fs.statSync(filepath).isFile();
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const hasMiddlewares = !!(config.build.koaMiddlewares && fileExists(config.build.koaMiddlewares));
+
+    if (hasMiddlewares) {
+        const middlewares = getAbsolutePath(config.build.koaMiddlewares);
+
+        webpackConfig.plugins.push(
+            new webpack.DefinePlugin({
+                KOA_MIDDLEWARES: JSON.stringify(middlewares)
+            })
+        );
+    }
+
+    webpackConfig.plugins.push(
+        new webpack.DefinePlugin({
+            USE_DEFAULT_KOA_MIDDLEWARES: config.build.useDefaultKoaMiddlewares,
+            HAS_KOA_MIDDLEWARES: hasMiddlewares
+        })
+    );
 
     return {
         buildConfig: webpackConfig,
