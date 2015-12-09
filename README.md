@@ -34,7 +34,7 @@ The application can be configured through the use of a `roc.config.js` file as w
 ## Tips
 
 ### Koa middlewares
-It's possible to add middlewares to the Koa server that is created in multiple ways. One way is to add them directly to the server instance that `createServer` returns. Another way is to use `roc.config.js` using `build.koaMiddlewares` by giving the path to a module that returns an array of middlewares and is given the configuration object as a parameter. By default Roc will add some common middlewares for you but if you don't want to use them you can override that by setting `build.useDefaultKoaMiddlewares` to `false`. Roc uses the [koa-static](https://github.com/koajs/static) internally always along as createServer is used.
+It's possible to add middlewares to the Koa server that is created in multiple ways. One way is to add them directly to the server instance that `createServer` returns. Another way is to use `roc.config.js` using `build.koaMiddlewares` by giving the path to a module that returns an array of middlewares and is given the configuration object as a parameter. By default Roc will add some common middlewares for you but if you don't want to use them you can override that by setting `build.useDefaultKoaMiddlewares` to `false`. Roc uses the [koa-static](https://github.com/koajs/static) internally always as long as createServer is used.
 
 #### Default
 By default these middlewares will be included always:
