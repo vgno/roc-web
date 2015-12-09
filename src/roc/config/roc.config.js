@@ -40,7 +40,7 @@ const config = {
         outputPath: { client: 'build/client', server: 'build/server'},
         moduleBuild: false,
         moduleStyle: '',
-        koaMiddlewares: 'koaMiddlewares.js',
+        koaMiddlewares: 'koa-middlewares.js',
         useDefaultKoaMiddlewares: true
     }
 };
