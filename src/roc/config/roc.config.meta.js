@@ -91,6 +91,7 @@ const configMeta = {
             verbose: isBoolean,
             mode: /^dev|dist|test$/i,
             target: isArray(/^client|server$/i),
+            disableProgressbar: isBoolean,
             entry: {
                 client: isPath,
                 server: isPath
