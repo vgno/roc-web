@@ -54,21 +54,24 @@ const build = (createBuilder, target, config, verbose) => {
                 const { buildConfig, builder } = createBuilder(target);
 
                 const compiler = builder(buildConfig);
-                const bar = multi.newBar(`Building ${target} [:bar] :percent :elapsed s :webpackInfo`, {
-                    complete: '=',
-                    incomplete: ' ',
-                    total: 100,
-                    // Some "magic" math to make sure that the progress bar fits in the terminal window
-                    // Based on the lenght of varius strings used in the output
-                    width: (process.stdout.columns - 52)
-                });
 
-                compiler.apply(new builder.ProgressPlugin(function(percentage, msg) {
-                    bar.update(percentage, {
-                        // Only use 20 characters for output to make sure it fits in the window
-                        webpackInfo: msg.substring(0, 20)
+                if (!config.build.disableProgressbar) {
+                    const bar = multi.newBar(`Building ${target} [:bar] :percent :elapsed s :webpackInfo`, {
+                        complete: '=',
+                        incomplete: ' ',
+                        total: 100,
+                        // Some "magic" math to make sure that the progress bar fits in the terminal window
+                        // Based on the lenght of varius strings used in the output
+                        width: (process.stdout.columns - 52)
                     });
-                }));
+
+                    compiler.apply(new builder.ProgressPlugin(function(percentage, msg) {
+                        bar.update(percentage, {
+                            // Only use 20 characters for output to make sure it fits in the window
+                            webpackInfo: msg.substring(0, 20)
+                        });
+                    }));
+                }
 
                 compiler.run((error, stats) => {
                     if (error) {

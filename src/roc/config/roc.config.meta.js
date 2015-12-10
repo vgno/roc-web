@@ -40,6 +40,7 @@ const configMeta = {
             verbose: 'If verbose mode should be used, returns more output during build',
             mode: 'What mode the application should be built for. Possible values are "dev", "dist" and "test"',
             target: 'For what target the application should be built for. Possible values are "client" and "server"',
+            disableProgressbar: 'Should the progress bar be disabled for builds',
             entry: {
                 client: 'The client entry point file',
                 server: 'The server entry point file'
