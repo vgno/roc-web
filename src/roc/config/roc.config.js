@@ -35,6 +35,7 @@ const config = {
         verbose: true,
         mode: 'dist',
         target: ['client', 'server'],
+        disableProgressbar: false,
         entry: { client: 'src/client/index.js', server: 'src/server/index.js'},
         outputName: 'app',
         outputPath: { client: 'build/client', server: 'build/server'},
