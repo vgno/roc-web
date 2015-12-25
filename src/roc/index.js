@@ -13,10 +13,8 @@ export watchClient from './runtime/watch-client';
 export watchServer from './runtime/watch-server';
 
 // Configuration
-export configFile from './config/roc.config.js';
 export { baseConfig } from './helpers/config';
 export { metaConfig } from './helpers/config';
-export { getConfig } from './helpers/config';
 
 // Runners
 export runBuild from './helpers/run-build';

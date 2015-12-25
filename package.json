@@ -3,6 +3,7 @@
   "version": "1.0.0-alpha11",
   "description": "Web base extension for Roc Applications",
   "main": "lib/index.js",
+  "bin": "lib/bin/index.js",
   "scripts": {
     "build": "babel src/roc --out-dir lib --source-maps",
     "build:watch": "npm run build -- --watch",

@@ -6,10 +6,8 @@ import MultiProgress from 'multi-progress';
 import pretty from 'prettysize';
 import colors from 'colors/safe';
 
-import { setApplicationConfigPath, getRawApplicationConfig, appendConfig, validate } from 'roc-config';
-
+import createBuilder from '../builder';
 import clean from '../builder/utils/clean';
-import { getConfig, metaConfig } from '../helpers/config';
 
 const multi = new MultiProgress();
 
@@ -47,11 +45,11 @@ const handleError = (verbose) => (error) => {
     /* eslint-enable */
 };
 
-const build = (createBuilder, target, config, verbose) => {
+const build = (buildX, target, config, verbose) => {
     return new Promise((resolve, reject) => {
         clean(config.build.outputPath[target])
             .then(() => {
-                const { buildConfig, builder } = createBuilder(target);
+                const { buildConfig, builder } = buildX(target);
 
                 const compiler = builder(buildConfig);
 
@@ -61,7 +59,7 @@ const build = (createBuilder, target, config, verbose) => {
                         incomplete: ' ',
                         total: 100,
                         // Some "magic" math to make sure that the progress bar fits in the terminal window
-                        // Based on the lenght of varius strings used in the output
+                        // Based on the lenght of various    strings used in the output
                         width: (process.stdout.columns - 52)
                     });
 
@@ -93,7 +91,8 @@ const build = (createBuilder, target, config, verbose) => {
 
                     return resolve({stats, target});
                 });
-            });
+            })
+        .catch(err => console.log(err, err.stack));
     });
 };
 
@@ -102,35 +101,26 @@ const build = (createBuilder, target, config, verbose) => {
  *
  * Helper for building an application.
  *
- * If a {@link createBuilder} has been defined in `roc.config.js` it will use that over the provided one.
- *
- * @param {{createBuilder: function}} rocExtension - The Roc Extension to use when building, see {@link createBuilder}
- * @param {string} [appConfigPath] - A path to a `roc.config.js` file that should be used
- * @param {object} [tempConfig] - A configuration object that should be used
+ * @param {boolean} debug - If debug is enabled
+ * @param {object} configuration - A configuration object that should be used
+ * @returns {Promise} A promise that will be resolved when the build is completed
  */
-export default function runBuild({ createBuilder }, appConfigPath = '', tempConfig = {}) {
-    setApplicationConfigPath(appConfigPath);
-    appendConfig(tempConfig);
-    const config = getConfig();
+export default function runBuild(debug, { settings, plugins }) {
+    let builder = createBuilder;
 
-    const rawApplicationConfig = getRawApplicationConfig();
-    if (rawApplicationConfig.createBuilder) {
-        /* eslint-disable no-console */
+    if (plugins && plugins.createBuilder) {
         console.log(colors.cyan(`Using the 'createBuilder' defined in the configuration file.\n`));
-        /* eslint-enable */
-        createBuilder = rawApplicationConfig.createBuilder;
+        builder = plugins.createBuilder;
     }
 
     /* eslint-disable no-console */
-    console.log(colors.cyan(`Starting the builder using "${config.build.mode}" as the mode.\n`));
+    console.log(colors.cyan(`Starting the builder using "${settings.build.mode}" as the mode.\n`));
     /* eslint-enable */
 
-    validate(config, metaConfig);
+    const verbose = settings.build.verbose;
 
-    const verbose = config.build.verbose;
-
-    const promises = config.build.target.map((target) => build(createBuilder, target, config, verbose));
-    Promise.all(promises)
+    const promises = settings.build.target.map((target) => build(builder, target, settings, verbose));
+    return Promise.all(promises)
         .then(handleCompletion)
         .catch(handleError(verbose));
 }

@@ -5,9 +5,8 @@ import webpack from 'webpack';
 import path from 'path';
 import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import { validate } from 'roc-config';
+import { getSettings } from 'roc-config';
 
-import { getConfig, metaConfig } from '../helpers/config';
 import { getDevPath, getAbsolutePath } from '../helpers/general';
 import { writeStats } from './utils/stats';
 
@@ -29,23 +28,22 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         throw new Error(`Invalid target, must be one of ${allowedTargets}. Was instead ${target}.`);
     }
 
-    const config = getConfig();
-    validate(config, metaConfig);
+    const settings = getSettings('build');
 
-    const DEV = (config.build.mode === 'dev');
-    const TEST = (config.build.mode === 'test');
-    const DIST = (config.build.mode === 'dist');
+    const DEV = (settings.mode === 'dev');
+    const TEST = (settings.mode === 'test');
+    const DIST = (settings.mode === 'dist');
 
     const SERVER = (target === 'server');
     const CLIENT = (target === 'client');
 
-    const COMPONENT_BUILD = !!config.build.moduleBuild;
+    const COMPONENT_BUILD = !!settings.moduleBuild;
 
     const ENV = DIST ? 'production' : 'development';
 
-    const entry = getAbsolutePath(config.build.entry[target]);
-    const outputPath = getAbsolutePath(config.build.outputPath[target]);
-    const componentStyle = getAbsolutePath(config.build.moduleStyle);
+    const entry = getAbsolutePath(settings.entry[target]);
+    const outputPath = getAbsolutePath(settings.outputPath[target]);
+    const componentStyle = getAbsolutePath(settings.moduleStyle);
 
     let webpackConfig = {};
 
@@ -58,7 +56,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     */
     if (SERVER) {
         webpackConfig.entry = {
-            [config.build.outputName]: [
+            [settings.outputName]: [
                 require.resolve('../../src/app/server-entry')
             ]
         };
@@ -66,14 +64,14 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         webpackConfig.entry = {};
     } else if (CLIENT && DEV) {
         webpackConfig.entry = {
-            [config.build.outputName]: [
+            [settings.outputName]: [
                 `webpack-hot-middleware/client?path=${getDevPath()}__webpack_hmr`,
                 entry
             ]
         };
     } else if (CLIENT) {
         webpackConfig.entry = {
-            [config.build.outputName]: [
+            [settings.outputName]: [
                 entry
             ]
         };
@@ -82,8 +80,8 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     if (CLIENT) {
         const makeAllPathsAbsolute = (input) => input.map((elem) => getAbsolutePath(elem));
 
-        const assets = makeAllPathsAbsolute(config.build.assets);
-        webpackConfig.entry[config.build.outputName] = webpackConfig.entry[config.build.outputName].concat(assets);
+        const assets = makeAllPathsAbsolute(settings.assets);
+        webpackConfig.entry[settings.outputName] = webpackConfig.entry[settings.outputName].concat(assets);
     }
 
     /**
@@ -143,7 +141,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     } else {
         webpackConfig.output = {
             path: outputPath,
-            publicPath: DIST ? config.path : getDevPath(),
+            publicPath: DIST ? settings.path : getDevPath(),
             filename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js',
             chunkFilename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js'
         };
@@ -253,7 +251,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         }, []);
     };
 
-    const scssStyles = flattenAssetsStyles(config.build.assets, /\.scss$/);
+    const scssStyles = flattenAssetsStyles(settings.assets, /\.scss$/);
 
     // GLOBAL STYLE LOADER
     const globalStyleLoader = {
@@ -366,7 +364,9 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
             '__SERVER__': SERVER,
             '__CLIENT__': CLIENT,
             'ROC_SERVER_ENTRY': JSON.stringify(entry),
-            'ROC_PATH_RESOLVER': JSON.stringify(resolver)
+            'ROC_PATH_RESOLVER': JSON.stringify(resolver),
+            // We need to do this since it effects the build
+            'ROC_PATH': JSON.stringify(settings.path)
         })
     );
 
@@ -438,10 +438,10 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         }
     };
 
-    const hasMiddlewares = !!(config.build.koaMiddlewares && fileExists(config.build.koaMiddlewares));
+    const hasMiddlewares = !!(settings.koaMiddlewares && fileExists(settings.koaMiddlewares));
 
     if (hasMiddlewares) {
-        const middlewares = getAbsolutePath(config.build.koaMiddlewares);
+        const middlewares = getAbsolutePath(settings.koaMiddlewares);
 
         webpackConfig.plugins.push(
             new webpack.DefinePlugin({
@@ -452,7 +452,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
 
     webpackConfig.plugins.push(
         new webpack.DefinePlugin({
-            USE_DEFAULT_KOA_MIDDLEWARES: config.build.useDefaultKoaMiddlewares,
+            USE_DEFAULT_KOA_MIDDLEWARES: settings.useDefaultKoaMiddlewares,
             HAS_KOA_MIDDLEWARES: hasMiddlewares
         })
     );

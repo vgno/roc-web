@@ -6,10 +6,9 @@ import watch from 'node-watch';
 import browserSync from 'browser-sync';
 import childProcess from 'child_process';
 
-import { getApplicationConfigPath, getAppendedConfig } from 'roc-config';
+import { getSettings } from 'roc-config';
 
 import { getDevPort, getPort } from '../helpers/general';
-import { getConfig } from '../helpers/config';
 import { parseStats } from '../builder/utils/stats';
 
 /**
@@ -19,8 +18,8 @@ import { parseStats } from '../builder/utils/stats';
  * @returns {Promise} Resolves after it has completed.
  */
 export default function watchServer(compiler) {
-    const config = getConfig();
-    debug.enable(config.dev.debug);
+    const settings = getSettings('dev');
+    debug.enable(settings.debug);
 
     const watcherLogger = debug('roc:dev:server:watcher');
     const builderLogger = debug('roc:dev:server:builder');
@@ -61,9 +60,9 @@ export default function watchServer(compiler) {
                             const debugOptions = (
                                 `<script>
                                     if (localStorage.debugTemp === localStorage.debug) {
-                                        localStorage.debug = '${config.dev.debug}';
+                                        localStorage.debug = '${settings.debug}';
                                     } else {
-                                        localStorage.debug = localStorage.debug + ',${config.dev.debug}';
+                                        localStorage.debug = localStorage.debug + ',${settings.debug}';
                                     }
                                     localStorage.debugTemp = localStorage.debug;
                                 </script>`
@@ -72,7 +71,7 @@ export default function watchServer(compiler) {
                         }
                     }
                 },
-                open: config.dev.open,
+                open: settings.open,
                 ui: {
                     port: parseInt(getDevPort(), 10) + 2
                 }
@@ -80,7 +79,7 @@ export default function watchServer(compiler) {
         };
 
         const watchForChanges = () => {
-            watch([bundlePath].concat(config.dev.watch), (file) => {
+            watch([bundlePath].concat(settings.watch), (file) => {
                 watcherLogger('Server restarting due to: ', file);
                 restartServer();
             });
@@ -107,8 +106,7 @@ export default function watchServer(compiler) {
         startServer = () => {
             const env = {
                 ...process.env,
-                ROC_CONFIG: getApplicationConfigPath(),
-                ROC_CONFIG_OBJECT: JSON.stringify(getAppendedConfig())
+                ROC_CONFIG_SETTINGS: JSON.stringify(getSettings())
             };
             server = childProcess.fork(bundlePath, { env });
             process.on('exit', () => server.kill('SIGTERM'));
@@ -120,7 +118,7 @@ export default function watchServer(compiler) {
                         initBrowsersync();
                         listenForInput();
                         watchForChanges();
-                    } else if (config.dev.reloadOnServerChange) {
+                    } else if (settings.reloadOnServerChange) {
                         browserSync.reload();
                     }
                 }

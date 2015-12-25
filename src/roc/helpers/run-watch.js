@@ -1,12 +1,18 @@
+import 'source-map-support/register';
+
 import fs from 'fs';
 import path from 'path';
 import colors from 'colors/safe';
 import mkdirp from 'mkdirp';
 
-import { setApplicationConfigPath, getRawApplicationConfig, appendConfig, validate } from 'roc-config';
+import { getSettings, appendSettings } from 'roc-config';
 
 import clean from '../builder/utils/clean';
-import { getConfig, metaConfig, baseConfig } from '../helpers/config';
+import { baseConfig } from '../helpers/config';
+import createBuilder from '../builder';
+
+import watchClient from '../runtime/watch-client';
+import watchServer from '../runtime/watch-server';
 
 const writeStatsFile = (buildPath, scriptPath) => {
     fs.stat(buildPath, (err) => {
@@ -29,12 +35,12 @@ const startWatcher = (target, compiler, buildConfig, watcher, outputName) => {
     return watcher[target](compiler);
 };
 
-const createWatcher = (config, target, createBuilder, watcher) => {
-    return clean(config.build.outputPath[target])
+const createWatcher = (settings, target, build, watcher) => {
+    return clean(settings.build.outputPath[target])
         .then(() => {
-            const { buildConfig, builder } = createBuilder(target);
+            const { buildConfig, builder } = build(target);
             const compiler = builder(buildConfig);
-            return startWatcher(target, compiler, buildConfig, watcher, config.build.outputName);
+            return startWatcher(target, compiler, buildConfig, watcher, settings.build.outputName);
         })
         .catch((error) => {
             /* eslint-disable no-console */
@@ -50,55 +56,45 @@ const createWatcher = (config, target, createBuilder, watcher) => {
  *
  * Helper for starting an application in watch mode.
  *
- * If a {@link createBuilder} has been defined in `roc.config.js` it will use that over the provided one.
- *
- * @param {!{createBuilder: function, watchClient: function, watchServer: function}} rocExtension -
- * The Roc Extension to use when starting the watcher, see {@link createBuilder} {@link watchClient} {@link watchServer}
- * @param {string} [appConfigPath] - A path to a `roc.config.js` file that should be used
- * @param {object} [tempConfig] - A configuration object that should be used
+ * @param {boolean} debug - If debug is enabled
+ * @param {object} configuration - A configuration object that should be used
  */
-export default function runWatch({ createBuilder, watchClient, watchServer }, appConfigPath = '', tempConfig = {}) {
+export default function runWatch(debug, { settings, plugins }) {
     const watcher = {
         client: watchClient,
         server: watchServer
     };
 
-    setApplicationConfigPath(appConfigPath);
-    appendConfig(tempConfig);
-
-    let config = getConfig();
-
     // Make sure that we are in dev mode
-    if (config.build.mode !== 'dev') {
-        if (config.build.mode && config.build.mode !== baseConfig.build.mode) {
+    if (settings.build.mode !== 'dev') {
+        if (settings.build.mode && settings.build.mode !== baseConfig.settings.build.mode) {
             /* eslint-disable no-console */
-            console.log(colors.yellow(`The mode in the configuration was ${config.build.mode} but it needs ` +
+            console.log(colors.yellow(`The mode in the configuration was ${settings.build.mode} but it needs ` +
                 `to be "dev". It has been automatically set to "dev" during this watch run.`));
             /* eslint-enable */
         }
 
-        appendConfig({build: {mode: 'dev'}});
-        config = getConfig();
+        appendSettings({build: {mode: 'dev'}});
+        settings = getSettings();
     }
 
-    const rawApplicationConfig = getRawApplicationConfig();
-    if (rawApplicationConfig.createBuilder) {
+    let builder = createBuilder;
+
+    if (plugins && plugins.createBuilder) {
         /* eslint-disable no-console */
         console.log(colors.cyan(`Using the 'createBuilder' defined in the configuration file.\n`));
         /* eslint-enable */
-        createBuilder = rawApplicationConfig.createBuilder;
+        builder = plugins.createBuilder;
     }
 
-    validate(config, metaConfig);
-
     // If the targets are both client and server we make sure the client is completed before continuing with the server
-    if (config.build.target.indexOf('client') > -1 && config.build.target.indexOf('server') > -1) {
-        createWatcher(config, 'client', createBuilder, watcher).then(() => {
-            createWatcher(config, 'server', createBuilder, watcher);
+    if (settings.build.target.indexOf('client') > -1 && settings.build.target.indexOf('server') > -1) {
+        createWatcher(settings, 'client', builder, watcher).then(() => {
+            createWatcher(settings, 'server', builder, watcher);
         });
     } else {
-        config.build.target.map((target) => {
-            createWatcher(config, target, createBuilder, watcher);
+        settings.build.target.map((target) => {
+            createWatcher(settings, target, builder, watcher);
         });
     }
 }
