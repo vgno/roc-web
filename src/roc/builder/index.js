@@ -5,9 +5,9 @@ import webpack from 'webpack';
 import path from 'path';
 import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import { getSettings } from 'roc-config';
+import { getSettings, getAbsolutePath } from 'roc-config';
 
-import { getDevPath, getAbsolutePath } from '../helpers/general';
+import { getDevPath } from '../helpers/general';
 import { writeStats } from './utils/stats';
 
 const bourbon = './node_modules/bourbon/app/assets/stylesheets/';

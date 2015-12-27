@@ -5,7 +5,6 @@ export createBuilder from './builder';
 
 // Helpers
 export getResolvePath from './helpers/get-resolve-path';
-export { getAbsolutePath } from './helpers/general';
 
 // Runtime
 export start from './runtime/start';

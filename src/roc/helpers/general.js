@@ -1,6 +1,5 @@
 import 'source-map-support/register';
 
-import path from 'path';
 import devip from 'dev-ip';
 import colors from 'colors/safe';
 
@@ -75,18 +74,4 @@ export function getPort() {
     }
 
     return process.env.PORT || settings.port;
-}
-
-/**
-* Makes a path absolute if not already is that
-*
-* @deprecated
-*
-* @param {string} filepath - The filepath to make absolute
-* @returns {string} A absolute path.
-*/
-export function getAbsolutePath(filepath) {
-    return path.isAbsolute(filepath) ?
-        filepath :
-        path.join(process.cwd(), filepath);
 }
