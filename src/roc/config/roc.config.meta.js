@@ -97,7 +97,6 @@ const configMeta = {
 
             build: {
                 assets: isArray(isPath),
-                verbose: isBoolean,
                 mode: /^dev|dist|test$/i,
                 target: isArray(/^client|server$/i),
                 disableProgressbar: isBoolean,
@@ -141,7 +140,7 @@ const configMeta = {
     },
 
     plugins: {
-        createBuilder: 'Can be used to override the internal builder.'
+        createBuilder: 'Used to define and extend the internal builder. See documentation for more information.'
     }
 };
 

@@ -1,6 +1,13 @@
 import 'source-map-support/register';
 
-import { build, start, dev, listSettings, markdownSettings } from '../commands';
+import createBuilder from '../builder';
+import {
+    build,
+    start,
+    dev,
+    listSettings,
+    markdownSettings
+} from '../commands';
 
 const config = {
     settings: {
@@ -39,7 +46,6 @@ const config = {
         build: {
             path: '/',
             assets: [],
-            verbose: true,
             mode: 'dist',
             target: ['client', 'server'],
             disableProgressbar: false,
@@ -60,6 +66,13 @@ const config = {
         'list-settings': listSettings,
         'markdown-settings': markdownSettings
     },
+
+    plugins: {
+        createBuilder: {
+            default: createBuilder
+        }
+    },
+
     extensions: []
 };
 
