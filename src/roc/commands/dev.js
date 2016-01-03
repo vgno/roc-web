@@ -9,7 +9,7 @@ import { getSettings, appendSettings } from 'roc-config';
 
 import clean from '../builder/utils/clean';
 import { baseConfig } from '../helpers/config';
-import createBuilder from '../builder';
+import { getBuilder } from '../helpers/plugin-managment';
 
 import watchClient from '../runtime/watch-client';
 import watchServer from '../runtime/watch-server';
@@ -35,10 +35,9 @@ const startWatcher = (target, compiler, buildConfig, watcher, outputName) => {
     return watcher[target](compiler);
 };
 
-const createWatcher = (settings, target, build, watcher) => {
+const createWatcher = (debug, settings, target, { buildConfig, builder }, watcher) => {
     return clean(settings.build.outputPath[target])
         .then(() => {
-            const { buildConfig, builder } = build(target);
             const compiler = builder(buildConfig);
             return startWatcher(target, compiler, buildConfig, watcher, settings.build.outputName);
         })
@@ -52,14 +51,21 @@ const createWatcher = (settings, target, build, watcher) => {
 };
 
 /**
- * Watch runner.
+ * Development runner.
  *
  * Helper for starting an application in watch mode.
  *
- * @param {boolean} debug - If debug is enabled
- * @param {object} configuration - A configuration object that should be used
+ * @param {object} rocCommandObject - A command object
  */
-export default function runWatch(debug, { settings, plugins }) {
+export default function runDev({
+    debug,
+    configObject: { settings, plugins },
+    extensionConfig: { plugins: extensionPlugins }
+}) {
+    if (!plugins || !plugins.createBuilder) {
+        throw new Error('No createBuilder defined in plugins in roc.config.js!');
+    }
+
     const watcher = {
         client: watchClient,
         server: watchServer
@@ -78,23 +84,17 @@ export default function runWatch(debug, { settings, plugins }) {
         settings = getSettings();
     }
 
-    let builder = createBuilder;
-
-    if (plugins && plugins.createBuilder) {
-        /* eslint-disable no-console */
-        console.log(colors.cyan(`Using the 'createBuilder' defined in the configuration file.\n`));
-        /* eslint-enable */
-        builder = plugins.createBuilder;
-    }
-
     // If the targets are both client and server we make sure the client is completed before continuing with the server
     if (settings.build.target.indexOf('client') > -1 && settings.build.target.indexOf('server') > -1) {
-        createWatcher(settings, 'client', builder, watcher).then(() => {
-            createWatcher(settings, 'server', builder, watcher);
+        const clientBuilder = getBuilder(debug, 'client', plugins.createBuilder, extensionPlugins.createBuilder);
+        createWatcher(debug, settings, 'client', clientBuilder, watcher).then(() => {
+            const serverBuilder = getBuilder(debug, 'server', plugins.createBuilder, extensionPlugins.createBuilder);
+            createWatcher(debug, settings, 'server', serverBuilder, watcher);
         });
     } else {
         settings.build.target.map((target) => {
-            createWatcher(settings, target, builder, watcher);
+            const builder = getBuilder(debug, target, plugins.createBuilder, extensionPlugins.createBuilder);
+            createWatcher(debug, settings, target, builder, watcher);
         });
     }
 }

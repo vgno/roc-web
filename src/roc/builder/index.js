@@ -1,7 +1,6 @@
 import 'source-map-support/register';
 
 import fs from 'fs';
-import webpack from 'webpack';
 import path from 'path';
 import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
@@ -17,11 +16,13 @@ const neat = './node_modules/bourbon-neat/app/assets/stylesheets/';
  * Creates a builder.
  *
  * @param {!string} target - a target: should be either "client" or "server"
+ * @param {rocBuilder} rocBuilder - A rocBuilder to base everything on.
  * @param {!string} [resolver=roc-web/lib/helpers/get-resolve-path] - Path to the resolver for the server side
  * {@link getResolvePath}
  * @returns {rocBuilder}
  */
-export default function createBuilder(target, resolver = 'roc-web/lib/helpers/get-resolve-path') {
+export default function createBuilder(target, { buildConfig = {}, builder = require('webpack') },
+    resolver = 'roc-web/lib/helpers/get-resolve-path') {
     const allowedTargets = ['server', 'client'];
 
     if (allowedTargets.indexOf(target) === -1) {
@@ -45,32 +46,30 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     const outputPath = getAbsolutePath(settings.outputPath[target]);
     const componentStyle = getAbsolutePath(settings.moduleStyle);
 
-    let webpackConfig = {};
-
     if (DIST) {
-        webpackConfig.bail = true;
+        buildConfig.bail = true;
     }
 
     /**
     * Entry
     */
     if (SERVER) {
-        webpackConfig.entry = {
+        buildConfig.entry = {
             [settings.outputName]: [
                 require.resolve('../../src/app/server-entry')
             ]
         };
     } else if (TEST) {
-        webpackConfig.entry = {};
+        buildConfig.entry = {};
     } else if (CLIENT && DEV) {
-        webpackConfig.entry = {
+        buildConfig.entry = {
             [settings.outputName]: [
                 `webpack-hot-middleware/client?path=${getDevPath()}__webpack_hmr`,
                 entry
             ]
         };
     } else if (CLIENT) {
-        webpackConfig.entry = {
+        buildConfig.entry = {
             [settings.outputName]: [
                 entry
             ]
@@ -81,18 +80,18 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
         const makeAllPathsAbsolute = (input) => input.map((elem) => getAbsolutePath(elem));
 
         const assets = makeAllPathsAbsolute(settings.assets);
-        webpackConfig.entry[settings.outputName] = webpackConfig.entry[settings.outputName].concat(assets);
+        buildConfig.entry[settings.outputName] = buildConfig.entry[settings.outputName].concat(assets);
     }
 
     /**
     * Target
     */
     if (SERVER) {
-        webpackConfig.target = 'node';
+        buildConfig.target = 'node';
     }
 
     if (SERVER) {
-        webpackConfig.externals = [
+        buildConfig.externals = [
             {
                 [resolver]: true,
                 ['roc-web/lib/helpers/config']: true
@@ -126,20 +125,20 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     * We want the source map files to be stored on a seperate server.
     */
     if (CLIENT && DEV) {
-        webpackConfig.devtool = 'cheap-module-inline-source-map';
+        buildConfig.devtool = 'cheap-module-inline-source-map';
     } else if (CLIENT && TEST) {
-        webpackConfig.devtool = 'inline-source-map';
+        buildConfig.devtool = 'inline-source-map';
     } else {
-        webpackConfig.devtool = 'source-map';
+        buildConfig.devtool = 'source-map';
     }
 
     /**
     * Output
     */
     if (TEST) {
-        webpackConfig.output = {};
+        buildConfig.output = {};
     } else {
-        webpackConfig.output = {
+        buildConfig.output = {
             path: outputPath,
             publicPath: DIST ? settings.path : getDevPath(),
             filename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js',
@@ -148,7 +147,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     }
 
     if (SERVER) {
-        webpackConfig.output.libraryTarget = 'commonjs2';
+        buildConfig.output.libraryTarget = 'commonjs2';
     }
 
     /**
@@ -156,14 +155,14 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     */
 
     // Base
-    webpackConfig.module = {
+    buildConfig.module = {
         preLoaders: [],
         loaders: []
     };
 
     // ISPARTA LOADER
     if (TEST) {
-        webpackConfig.module.loaders.push({
+        buildConfig.module.loaders.push({
             test: /\.js$/,
             loader: 'babel-loader',
             // FIXME
@@ -172,7 +171,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
                 /karma/
             ]
         });
-        webpackConfig.module.preLoaders.push({
+        buildConfig.module.preLoaders.push({
             test: /\.js$/,
             loader: 'isparta-loader',
             // FIXME
@@ -220,7 +219,7 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     };
 
     if (!TEST) {
-        webpackConfig.module.loaders.push(jsLoader);
+        buildConfig.module.loaders.push(jsLoader);
     }
 
     const getScssLoader = (base = 'css-loader', modules = false) => {
@@ -292,43 +291,43 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
 
     styleLoader.loader = styleLoaders;
 
-    webpackConfig.module.loaders.push(styleLoader);
+    buildConfig.module.loaders.push(styleLoader);
 
     if (CLIENT) {
-        webpackConfig.module.loaders.push(globalStyleLoader);
+        buildConfig.module.loaders.push(globalStyleLoader);
     }
 
-    // Post CSS webpackConfig
-    webpackConfig.postcss = [
+    // Post CSS buildConfig
+    buildConfig.postcss = [
         autoprefixer({
             browsers: ['last 2 version']
         })
     ];
 
     // FILE LOADERS
-    webpackConfig.module.loaders.push({
+    buildConfig.module.loaders.push({
         test: /\.(png|svg)$/,
         loader: 'url-loader?limit=100000'
     });
 
-    webpackConfig.module.loaders.push({
+    buildConfig.module.loaders.push({
         test: /\.(jpg)$/,
         loader: 'file-loader'
     });
 
-    webpackConfig.module.loaders.push(jsonLoader);
+    buildConfig.module.loaders.push(jsonLoader);
 
     /**
     * Resolve
     */
-    webpackConfig.resolve = {
+    buildConfig.resolve = {
         fallback: [
             path.join(__dirname, '../../node_modules')
         ],
         extensions: ['', '.js', '.css', '.scss']
     };
 
-    webpackConfig.resolveLoader = {
+    buildConfig.resolveLoader = {
         root: [
             path.join(process.cwd(), 'node_modules'),
             path.join(__dirname, '../../node_modules')
@@ -338,25 +337,25 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     /**
     * Plugins
     */
-    webpackConfig.plugins = [];
+    buildConfig.plugins = [];
 
     if (CLIENT) {
-        webpackConfig.plugins.push(
-            new webpack.IgnorePlugin(/^config$/)
+        buildConfig.plugins.push(
+            new builder.IgnorePlugin(/^config$/)
         );
     }
 
     const styleName = COMPONENT_BUILD ? '[name].component.css' : '[name].[hash].css';
 
-    webpackConfig.plugins.push(
+    buildConfig.plugins.push(
         new ExtractTextPlugin(styleName, {
             disable: CLIENT && DEV
         })
     );
 
-    webpackConfig.plugins.push(
+    buildConfig.plugins.push(
         // process.env.NODE_ENV is used by React and some other libs to determine what to run
-        new webpack.DefinePlugin({
+        new builder.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(ENV),
             '__DEV__': DEV,
             '__TEST__': TEST,
@@ -371,35 +370,35 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     );
 
     if (DIST) {
-        webpackConfig.plugins.push(function() {
+        buildConfig.plugins.push(function() {
             this.plugin('done', writeStats);
         });
     }
 
     if (DEV && CLIENT) {
-        webpackConfig.plugins.push(
-            new webpack.optimize.OccurenceOrderPlugin(),
-            new webpack.HotModuleReplacementPlugin(),
-            new webpack.NoErrorsPlugin()
+        buildConfig.plugins.push(
+            new builder.optimize.OccurenceOrderPlugin(),
+            new builder.HotModuleReplacementPlugin(),
+            new builder.NoErrorsPlugin()
         );
     }
 
     if (DEV && SERVER) {
-        webpackConfig.plugins.push(
-            new webpack.NoErrorsPlugin()
+        buildConfig.plugins.push(
+            new builder.NoErrorsPlugin()
         );
     }
 
     if (DIST) {
-        webpackConfig.plugins.push(
-            new webpack.optimize.DedupePlugin(),
-            new webpack.optimize.OccurenceOrderPlugin()
+        buildConfig.plugins.push(
+            new builder.optimize.DedupePlugin(),
+            new builder.optimize.OccurenceOrderPlugin()
         );
     }
 
     if (DIST && CLIENT) {
-        webpackConfig.plugins.push(
-            new webpack.optimize.UglifyJsPlugin({
+        buildConfig.plugins.push(
+            new builder.optimize.UglifyJsPlugin({
                 /* eslint-disable */
                 compress: {
                     warnings: false,
@@ -412,16 +411,16 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     }
 
     if (COMPONENT_BUILD) {
-        webpackConfig.output.libraryTarget = 'umd';
-        webpackConfig.output.filename = '[name].component.js';
-        webpackConfig.entry = {
+        buildConfig.output.libraryTarget = 'umd';
+        buildConfig.output.filename = '[name].component.js';
+        buildConfig.entry = {
             app: [
                 require.resolve('../../component/entry')
             ]
         };
 
-        webpackConfig.plugins.push(
-            new webpack.DefinePlugin({
+        buildConfig.plugins.push(
+            new builder.DefinePlugin({
                 COMPONENT_ENTRY: JSON.stringify(entry),
                 COMPONENT_STYLE: JSON.stringify(componentStyle)
             })
@@ -443,22 +442,22 @@ export default function createBuilder(target, resolver = 'roc-web/lib/helpers/ge
     if (hasMiddlewares) {
         const middlewares = getAbsolutePath(settings.koaMiddlewares);
 
-        webpackConfig.plugins.push(
-            new webpack.DefinePlugin({
+        buildConfig.plugins.push(
+            new builder.DefinePlugin({
                 KOA_MIDDLEWARES: JSON.stringify(middlewares)
             })
         );
     }
 
-    webpackConfig.plugins.push(
-        new webpack.DefinePlugin({
+    buildConfig.plugins.push(
+        new builder.DefinePlugin({
             USE_DEFAULT_KOA_MIDDLEWARES: settings.useDefaultKoaMiddlewares,
             HAS_KOA_MIDDLEWARES: hasMiddlewares
         })
     );
 
     return {
-        buildConfig: webpackConfig,
-        builder: webpack
+        buildConfig,
+        builder
     };
 }

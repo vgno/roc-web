@@ -69,6 +69,8 @@
     "koa-static": "~1.5.1",
     "koa-webpack-dev-middleware": "~1.0.1",
     "koa-webpack-hot-middleware": "~1.0.1",
+    "lodash.isfunction": "~3.0.6",
+    "lodash.isplainobject": "~3.2.0",
     "mkdirp": "~0.5.1",
     "multi-progress": "~1.0.0",
     "node-sass": "~3.4.2",

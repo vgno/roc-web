@@ -7,6 +7,12 @@ import koaFavicon from 'koa-favicon';
 import koaAccesslog from 'koa-accesslog';
 import koaLogger from 'koa-logger';
 
+/**
+ * Returns the middlewares to be used
+ *
+ * @param {object} config - A roc config object.
+ * @returns {array} A array with middlewares to use.
+ */
 export default function middlewares(config) {
     const middlewaresList = [];
 

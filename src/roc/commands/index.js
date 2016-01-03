@@ -2,14 +2,24 @@ import 'source-map-support/register';
 
 import { generateTextDocumentation, generateMarkdownDocumentation } from 'roc-config';
 
-export build from '../helpers/run-build';
-export dev from '../helpers/run-watch';
-export start from '../runtime/start';
+export build from './build';
+export dev from './dev';
+export start from './start';
 
-export function listSettings(debug, config, meta, extensionConfig) {
-    console.log(generateTextDocumentation(extensionConfig, meta));
+/**
+ * List the settings that are possible with the current extensions.
+ *
+ * @param {object} rocCommandObject - A command object
+ */
+export function listSettings({ metaObject, extensionConfig }) {
+    console.log(generateTextDocumentation(extensionConfig, metaObject));
 }
 
-export function markdownSettings(debug, config, meta, extensionConfig) {
-    console.log(generateMarkdownDocumentation(extensionConfig, meta));
+/**
+ * List the settings that are possible with the current extensions in a markdown format.
+ *
+ * @param {object} rocCommandObject - A command object
+ */
+export function markdownSettings({ metaObject, extensionConfig }) {
+    console.log(generateMarkdownDocumentation(extensionConfig, metaObject));
 }
