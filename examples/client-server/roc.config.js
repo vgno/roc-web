@@ -1,8 +1,10 @@
 module.exports = {
-    config: {
-        port: 8080,
-        serve: 'files',
-        favicon: 'files/roc.png',
+    settings: {
+        runtime: {
+            port: 8080,
+            serve: 'files',
+            favicon: 'files/roc.png'
+        },
         build: {
             entry: {
                 client: 'client.js',
