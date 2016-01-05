@@ -6,7 +6,7 @@ import watch from 'node-watch';
 import browserSync from 'browser-sync';
 import childProcess from 'child_process';
 
-import { getSettings } from 'roc-config';
+import { getSettings } from 'roc';
 
 import { getDevPort, getPort } from '../helpers/general';
 import { parseStats } from '../builder/utils/stats';

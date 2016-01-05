@@ -21,7 +21,7 @@ require('source-map-support').install();
 // Disable warnings from missing config in a application
 process.env.SUPPRESS_NO_CONFIG_WARNING = true;
 
-const settings = require('roc-config').getSettings('runtime');
+const settings = require('roc').getSettings('runtime');
 
 // Enable debug based on roc.config.js settings
 require('debug').enable(settings.debug.server);

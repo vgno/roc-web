@@ -7,7 +7,7 @@ import {
     isPath,
     isArray,
     isArrayOrSingle
-} from 'roc-config/validators';
+} from 'roc/validators';
 
 const configMeta = {
     settings: {

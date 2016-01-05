@@ -5,7 +5,7 @@ import path from 'path';
 import colors from 'colors/safe';
 import mkdirp from 'mkdirp';
 
-import { getSettings, appendSettings } from 'roc-config';
+import { getSettings, appendSettings } from 'roc';
 
 import clean from '../builder/utils/clean';
 import { baseConfig } from '../helpers/config';

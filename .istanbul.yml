@@ -1,7 +1,7 @@
 instrumentation:
     root: src
     excludes: []
-    include-all-sources: true
+    include-all-sources: false
 reporting:
     print: summary
     reports:

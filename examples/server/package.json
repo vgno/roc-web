@@ -5,7 +5,7 @@
   "author": "VG",
   "license": "MIT",
   "scripts": {
-    "dev": "roc-web dev --build-target server --build-entry-server index.js"
+    "dev": "roc dev --build-target server --build-entry-server index.js"
   },
   "dependencies": {
     "koa-hello-world": "~1.0.1",

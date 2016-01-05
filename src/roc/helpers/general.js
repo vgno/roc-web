@@ -3,7 +3,7 @@ import 'source-map-support/register';
 import devip from 'dev-ip';
 import colors from 'colors/safe';
 
-import { getSettings } from 'roc-config';
+import { getSettings } from 'roc';
 
 import { baseConfig } from './config';
 

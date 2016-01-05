@@ -4,7 +4,7 @@ import debug from 'debug';
 import koa from 'koa';
 import serve from 'koa-static';
 
-import { merge, getSettings } from 'roc-config';
+import { merge, getSettings } from 'roc';
 
 /**
  * Creates a server instance.

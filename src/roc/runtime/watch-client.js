@@ -4,7 +4,7 @@ import debug from 'debug';
 import koa from 'koa';
 import koaWebpackDevMiddleware from 'koa-webpack-dev-middleware';
 import koaWebpackHotMiddleware from 'koa-webpack-hot-middleware';
-import { getSettings } from 'roc-config';
+import { getSettings } from 'roc';
 
 import { getDevPort } from '../helpers/general';
 

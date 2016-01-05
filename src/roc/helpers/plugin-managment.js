@@ -1,5 +1,5 @@
-import isPlainObject from 'lodash.isPlainObject';
-import isFunction from 'lodash.isFunction';
+import isPlainObject from 'lodash.isplainobject';
+import isFunction from 'lodash.isfunction';
 
 let once = true;
 /**

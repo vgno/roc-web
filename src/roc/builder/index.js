@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import { getSettings, getAbsolutePath } from 'roc-config';
+import { getSettings, getAbsolutePath } from 'roc';
 
 import { getDevPath } from '../helpers/general';
 import { writeStats } from './utils/stats';

@@ -1,6 +1,6 @@
 import 'source-map-support/register';
 
-import { generateTextDocumentation, generateMarkdownDocumentation } from 'roc-config';
+import { generateTextDocumentation, generateMarkdownDocumentation } from 'roc';
 
 export build from './build';
 export dev from './dev';
