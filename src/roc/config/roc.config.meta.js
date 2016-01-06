@@ -74,7 +74,6 @@ const configMeta = {
                 },
                 serve: isArrayOrSingle(isPath),
                 favicon: isString,
-                path: isPath,
                 startBundle: isPath
             },
 
@@ -96,6 +95,7 @@ const configMeta = {
             },
 
             build: {
+                path: isPath,
                 assets: isArray(isPath),
                 mode: /^dev|dist|test$/i,
                 target: isArray(/^client|server$/i),

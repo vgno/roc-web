@@ -11,7 +11,7 @@ import debug from 'debug';
 export default function start({ configObject: { settings }, parsedOptions }) {
     debug.enable(settings.dev.debug);
 
-    const artifact = parsedOptions.arguments.artifact ||
+    const artifact = parsedOptions.options.artifact ||
         settings.runtime.startBundle && path.join(process.cwd(), settings.runtime.startBundle) ||
         path.join(process.cwd(), settings.build.outputPath.server, `${settings.build.outputName}.roc.js`);
 
