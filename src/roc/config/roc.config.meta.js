@@ -117,7 +117,8 @@ const configMeta = {
 
     commands: {
         'build': {
-            settings: ['build']
+            settings: ['build'],
+            description: 'Build the current project.'
         },
         'start': {
             settings: ['runtime'],
