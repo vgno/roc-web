@@ -1,10 +1,11 @@
 import 'source-map-support/register';
 
-import path from 'path';
 import devip from 'dev-ip';
 import colors from 'colors/safe';
 
-import { getConfig, baseConfig } from './config';
+import { getSettings } from 'roc';
+
+import { baseConfig } from './config';
 
 let oncePort = true;
 let onceDevPort = true;
@@ -36,9 +37,9 @@ export function getDevPath(relativeBuildPath = '') {
  * @returns {number} The final port for the dev server.
  */
 export function getDevPort() {
-    const config = getConfig();
+    const settings = getSettings('dev');
 
-    if (config.dev.port !== baseConfig.dev.port && process.env.DEV_PORT && onceDevPort) {
+    if (settings.port !== baseConfig.settings.dev.port && process.env.DEV_PORT && onceDevPort) {
         onceDevPort = false;
         /* eslint-disable no-console */
         console.log(colors.red('You have configured a dev port but the environment ' +
@@ -47,7 +48,7 @@ export function getDevPort() {
         ));
         /* eslint-enable */
     }
-    return process.env.DEV_PORT || config.dev.port;
+    return process.env.DEV_PORT || settings.port;
 }
 
 /**
@@ -60,9 +61,9 @@ export function getDevPort() {
 * @returns {number} The final port for the server.
 */
 export function getPort() {
-    const config = getConfig();
+    const settings = getSettings('runtime');
 
-    if (config.port && process.env.PORT && oncePort) {
+    if (settings.port && process.env.PORT && oncePort) {
         oncePort = false;
         /* eslint-disable no-console */
         console.log(colors.red('You have configured a port but the environment ' +
@@ -72,17 +73,5 @@ export function getPort() {
         /* eslint-enable */
     }
 
-    return process.env.PORT || config.port;
-}
-
-/**
-* Makes a path absolute if not already is that
-*
-* @param {string} filepath - The filepath to make absolute
-* @returns {string} A absolute path.
-*/
-export function getAbsolutePath(filepath) {
-    return path.isAbsolute(filepath) ?
-        filepath :
-        path.join(process.cwd(), filepath);
+    return process.env.PORT || settings.port;
 }

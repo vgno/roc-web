@@ -1,49 +1,79 @@
-const config = {
-    port: 3000,
-    debug: {
-        server: 'roc:*'
-    },
-    serve: [
-        'build/client'
-    ],
-    favicon: '',
-    path: '/',
-    startBundle: '',
+import 'source-map-support/register';
 
-    dev: {
-        debug: 'roc:*',
-        port: 3001,
-        watch: [
-            'config/',
-            'roc.config.js'
-        ],
-        reloadOnServerChange: false,
-        open: false,
-        devMiddleware: {
-            noInfo: true,
-            quiet: false
+import createBuilder from '../builder';
+import {
+    build,
+    start,
+    dev,
+    listSettings,
+    markdownSettings
+} from '../commands';
+
+const config = {
+    settings: {
+        runtime: {
+            port: 3000,
+            debug: {
+                server: 'roc:*'
+            },
+            serve: [
+                'build/client'
+            ],
+            favicon: '',
+            startBundle: ''
         },
-        hotMiddleware: {
-            reload: false,
-            noInfo: false,
-            quiet: false
+
+        dev: {
+            debug: 'roc:*',
+            port: 3001,
+            watch: [
+                'config/',
+                'roc.config.js'
+            ],
+            reloadOnServerChange: false,
+            open: false,
+            devMiddleware: {
+                noInfo: true,
+                quiet: false
+            },
+            hotMiddleware: {
+                reload: false,
+                noInfo: false,
+                quiet: false
+            }
+        },
+
+        build: {
+            path: '/',
+            assets: [],
+            mode: 'dist',
+            target: ['client', 'server'],
+            disableProgressbar: false,
+            entry: { client: 'src/client/index.js', server: 'src/server/index.js'},
+            outputName: 'app',
+            outputPath: { client: 'build/client', server: 'build/server'},
+            moduleBuild: false,
+            moduleStyle: '',
+            koaMiddlewares: 'koa-middlewares.js',
+            useDefaultKoaMiddlewares: true
         }
     },
 
-    build: {
-        assets: [],
-        verbose: true,
-        mode: 'dist',
-        target: ['client', 'server'],
-        disableProgressbar: false,
-        entry: { client: 'src/client/index.js', server: 'src/server/index.js'},
-        outputName: 'app',
-        outputPath: { client: 'build/client', server: 'build/server'},
-        moduleBuild: false,
-        moduleStyle: '',
-        koaMiddlewares: 'koa-middlewares.js',
-        useDefaultKoaMiddlewares: true
-    }
+    commands: {
+        build,
+        start,
+        dev,
+        'list-settings': listSettings,
+        'markdown-settings': markdownSettings
+    },
+
+    plugins: {
+        createBuilder: {
+            default: createBuilder
+        }
+    },
+
+    extensions: []
 };
 
 /**

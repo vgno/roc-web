@@ -2,7 +2,7 @@ import 'source-map-support/register';
 
 import rimraf from 'rimraf';
 
-import { getAbsolutePath } from '../../helpers/general';
+import { getAbsolutePath } from 'roc';
 
 /**
  * Cleans a directory

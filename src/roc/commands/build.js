@@ -6,10 +6,8 @@ import MultiProgress from 'multi-progress';
 import pretty from 'prettysize';
 import colors from 'colors/safe';
 
-import { setApplicationConfigPath, getRawApplicationConfig, appendConfig, validate } from 'roc-config';
-
 import clean from '../builder/utils/clean';
-import { getConfig, metaConfig } from '../helpers/config';
+import { getBuilder } from '../helpers/plugin-managment';
 
 const multi = new MultiProgress();
 
@@ -29,14 +27,14 @@ const handleCompletion = (results) => {
     }
 };
 
-const handleError = (verbose) => (error) => {
+const handleError = (debug) => (error) => {
     const errorMessage = error.target ? ' for ' + colors.bold(error.target) : '';
 
     console.log(colors.red(`\n\nBuild failed${errorMessage}\n`));
 
     console.log(colors.red(error.message));
 
-    if (verbose) {
+    if (debug) {
         console.log(error.stack);
     } else {
         console.log('\nRun with debug for more output.\n');
@@ -47,12 +45,10 @@ const handleError = (verbose) => (error) => {
     /* eslint-enable */
 };
 
-const build = (createBuilder, target, config, verbose) => {
+const build = ({ buildConfig, builder }, target, config, debug) => {
     return new Promise((resolve, reject) => {
         clean(config.build.outputPath[target])
             .then(() => {
-                const { buildConfig, builder } = createBuilder(target);
-
                 const compiler = builder(buildConfig);
 
                 if (!config.build.disableProgressbar) {
@@ -61,7 +57,7 @@ const build = (createBuilder, target, config, verbose) => {
                         incomplete: ' ',
                         total: 100,
                         // Some "magic" math to make sure that the progress bar fits in the terminal window
-                        // Based on the lenght of varius strings used in the output
+                        // Based on the lenght of various strings used in the output
                         width: (process.stdout.columns - 52)
                     });
 
@@ -81,7 +77,7 @@ const build = (createBuilder, target, config, verbose) => {
                     }
 
                     // FIXME Handle this better
-                    const options = verbose ? null : {errorDetails: false};
+                    const options = debug ? null : {errorDetails: false};
                     const statsJson = stats.toJson(options);
                     if (statsJson.errors.length > 0) {
                         statsJson.errors.map(err => console.log(err));
@@ -93,7 +89,8 @@ const build = (createBuilder, target, config, verbose) => {
 
                     return resolve({stats, target});
                 });
-            });
+            })
+        .catch(err => console.log(err, err.stack));
     });
 };
 
@@ -102,35 +99,28 @@ const build = (createBuilder, target, config, verbose) => {
  *
  * Helper for building an application.
  *
- * If a {@link createBuilder} has been defined in `roc.config.js` it will use that over the provided one.
- *
- * @param {{createBuilder: function}} rocExtension - The Roc Extension to use when building, see {@link createBuilder}
- * @param {string} [appConfigPath] - A path to a `roc.config.js` file that should be used
- * @param {object} [tempConfig] - A configuration object that should be used
+ * @param {object} rocCommandObject - A command object
+ * @returns {Promise} A promise that will be resolved when the build is completed
  */
-export default function runBuild({ createBuilder }, appConfigPath = '', tempConfig = {}) {
-    setApplicationConfigPath(appConfigPath);
-    appendConfig(tempConfig);
-    const config = getConfig();
-
-    const rawApplicationConfig = getRawApplicationConfig();
-    if (rawApplicationConfig.createBuilder) {
-        /* eslint-disable no-console */
-        console.log(colors.cyan(`Using the 'createBuilder' defined in the configuration file.\n`));
-        /* eslint-enable */
-        createBuilder = rawApplicationConfig.createBuilder;
+export default function runBuild({
+    debug,
+    configObject: { settings, plugins },
+    extensionConfig: { plugins: extensionPlugins }
+}) {
+    if (!plugins || !plugins.createBuilder) {
+        throw new Error('No createBuilder defined in plugins in roc.config.js!');
     }
 
     /* eslint-disable no-console */
-    console.log(colors.cyan(`Starting the builder using "${config.build.mode}" as the mode.\n`));
+    console.log(colors.cyan(`Starting the builder using "${settings.build.mode}" as the mode.\n`));
     /* eslint-enable */
 
-    validate(config, metaConfig);
+    const promises = settings.build.target.map((target) => {
+        const builder = getBuilder(debug, target, plugins.createBuilder, extensionPlugins.createBuilder);
+        return build(builder, target, settings, debug);
+    });
 
-    const verbose = config.build.verbose;
-
-    const promises = config.build.target.map((target) => build(createBuilder, target, config, verbose));
-    Promise.all(promises)
+    return Promise.all(promises)
         .then(handleCompletion)
-        .catch(handleError(verbose));
+        .catch(handleError(debug));
 }

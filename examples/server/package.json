@@ -1,8 +1,7 @@
 {
   "name": "roc-web-server-example",
-  "version": "1.0.0-alpha1",
+  "version": "1.0.0",
   "description": "Roc Web server example",
-  "roc": "1.0.0-alpha8",
   "author": "VG",
   "license": "MIT",
   "scripts": {

@@ -4,9 +4,9 @@ import debug from 'debug';
 import koa from 'koa';
 import koaWebpackDevMiddleware from 'koa-webpack-dev-middleware';
 import koaWebpackHotMiddleware from 'koa-webpack-hot-middleware';
+import { getSettings } from 'roc';
 
 import { getDevPort } from '../helpers/general';
-import { getConfig } from '../helpers/config';
 
 /**
  * Client watcher.
@@ -15,8 +15,8 @@ import { getConfig } from '../helpers/config';
  * @returns {Promise} Resolves after it has completed.
  */
 export default function watchClient(compiler) {
-    const config = getConfig();
-    debug.enable(config.dev.debug);
+    const settings = getSettings('dev');
+    debug.enable(settings.debug);
 
     return new Promise((resolve, reject) => {
         if (!compiler) {
@@ -30,16 +30,16 @@ export default function watchClient(compiler) {
             koaWebpackDevMiddleware(compiler, {
                 // Let the publicPath be / since we want it to be based on the root of the dev server
                 publicPath: '/',
-                noInfo: config.dev.devMiddleware.noInfo,
-                quiet: config.dev.devMiddleware.quiet
+                noInfo: settings.devMiddleware.noInfo,
+                quiet: settings.devMiddleware.quiet
             })
         );
 
         server.use(
             koaWebpackHotMiddleware(compiler, {
-                reload: config.dev.hotMiddleware.reload,
-                noInfo: config.dev.hotMiddleware.noInfo,
-                quiet: config.dev.hotMiddleware.quiet
+                reload: settings.hotMiddleware.reload,
+                noInfo: settings.hotMiddleware.noInfo,
+                quiet: settings.hotMiddleware.quiet
             })
         );
 

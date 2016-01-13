@@ -4,9 +4,7 @@ import debug from 'debug';
 import koa from 'koa';
 import serve from 'koa-static';
 
-import { merge } from 'roc-config';
-
-const getConfig = require('roc-web/lib/helpers/config').getConfig;
+import { merge, getSettings } from 'roc';
 
 /**
  * Creates a server instance.
@@ -25,15 +23,15 @@ const getConfig = require('roc-web/lib/helpers/config').getConfig;
  */
 export default function createServer(options = {}) {
     const server = koa();
-    const config = merge(getConfig(), options);
+    const settings = merge(getSettings('runtime'), options);
 
     if (USE_DEFAULT_KOA_MIDDLEWARES) {
-        const middlewares = require('./middlewares')(config);
+        const middlewares = require('./middlewares')(settings);
         middlewares.forEach((middleware) => server.use(middleware));
     }
 
     if (HAS_KOA_MIDDLEWARES) {
-        const middlewares = require(KOA_MIDDLEWARES)(config);
+        const middlewares = require(KOA_MIDDLEWARES)(settings);
         middlewares.forEach((middleware) => server.use(middleware));
     }
 
@@ -45,10 +43,10 @@ export default function createServer(options = {}) {
     };
 
     // Serve folders
-    makeServe(config.serve);
+    makeServe(settings.serve);
 
     function start(port) {
-        port = port || process.env.PORT || config.port;
+        port = port || process.env.PORT || settings.port;
         server.listen(port);
 
         if (process.send) {
