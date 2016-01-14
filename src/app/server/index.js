@@ -16,18 +16,24 @@ import { merge, getSettings } from 'roc';
  *    serve: 'static',
  *    favicon: 'static/favicon.png'
  * });
+ *
  * server.start();
  *
  * @param {rocServerOptions} options - Options for the server. Will override configuration in roc.config.js.
+ * @param {Function[]} beforeUserMiddlewares - Middlewares that should be added before the user middlewares.
  * @returns {rocServer} server - Roc server instace.
  */
-export default function createServer(options = {}) {
+export default function createServer(options = {}, beforeUserMiddlewares = []) {
     const server = koa();
     const settings = merge(getSettings('runtime'), options);
 
     if (USE_DEFAULT_KOA_MIDDLEWARES) {
         const middlewares = require('./middlewares')(settings);
         middlewares.forEach((middleware) => server.use(middleware));
+    }
+
+    if (beforeUserMiddlewares.length) {
+        beforeUserMiddlewares.forEach((middleware) => server.use(middleware));
     }
 
     if (HAS_KOA_MIDDLEWARES) {
