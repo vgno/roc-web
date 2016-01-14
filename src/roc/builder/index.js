@@ -6,7 +6,7 @@ import autoprefixer from 'autoprefixer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import { getSettings, getAbsolutePath } from 'roc';
 
-import { getDevPath } from '../helpers/general';
+import { getDevPath, removeTrailingSlash, addTrailingSlash } from '../helpers/general';
 import { writeStats } from './utils/stats';
 
 const bourbon = './node_modules/bourbon/app/assets/stylesheets/';
@@ -140,7 +140,7 @@ export default function createBuilder(target, { buildConfig = {}, builder = requ
     } else {
         buildConfig.output = {
             path: outputPath,
-            publicPath: DIST ? settings.path : getDevPath(),
+            publicPath: DIST ? addTrailingSlash(settings.path) : getDevPath(),
             filename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js',
             chunkFilename: (DIST && CLIENT) ? '[name].[hash].roc.js' : '[name].roc.js'
         };
@@ -365,7 +365,7 @@ export default function createBuilder(target, { buildConfig = {}, builder = requ
             'ROC_SERVER_ENTRY': JSON.stringify(entry),
             'ROC_PATH_RESOLVER': JSON.stringify(resolver),
             // We need to do this since it effects the build
-            'ROC_PATH': JSON.stringify(settings.path)
+            'ROC_PATH': JSON.stringify(removeTrailingSlash(settings.path))
         })
     );
 

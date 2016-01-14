@@ -75,3 +75,39 @@ export function getPort() {
 
     return process.env.PORT || settings.port;
 }
+
+/**
+* Removes possible trailing slashes from a path.
+*
+* @param {string} path - Path to remove possible trailing slashes.
+*
+* @returns {string} - Path without trailing slashes.
+*/
+export function removeTrailingSlash(path) {
+    const newPath = path.replace(/\/+$/, '');
+
+    if (!newPath) {
+        return '/';
+    }
+
+    return newPath;
+}
+
+/**
+* Adds a trailing slashes to a path.
+*
+* Runs {@link removeTrailingSlash} internally first.
+*
+* @param {string} path - Path to add a trailing slashes to.
+*
+* @returns {string} - Path with trailing slash.
+*/
+export function addTrailingSlash(path) {
+    const newPath = removeTrailingSlash(path);
+
+    if (newPath !== '/') {
+        return newPath + '/';
+    }
+
+    return newPath;
+}
