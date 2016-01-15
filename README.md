@@ -1,5 +1,5 @@
 # roc-web
-![stability alpha](https://img.shields.io/badge/stability-alpha-red.svg)
+![stability beta](https://img.shields.io/badge/stability-beta-yellow.svg)
 [![roc](https://img.shields.io/npm/v/roc-web.svg)](https://www.npmjs.com/package/roc-web)
 [![build status](https://travis-ci.org/vgno/roc-web.svg)](https://travis-ci.org/vgno/roc-web)
 [![Coverage Status](https://coveralls.io/repos/vgno/roc-web/badge.svg?branch=master&service=github)](https://coveralls.io/github/vgno/roc-web?branch=master)
