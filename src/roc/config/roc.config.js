@@ -20,7 +20,21 @@ const config = {
                 'build/client'
             ],
             favicon: '',
-            startBundle: ''
+            startBundle: '',
+            koa: {
+                lowercase: {
+                    enabled: true,
+                    defer: true
+                },
+                normalize: {
+                    enabled: true,
+                    defer: false
+                },
+                trailingSlashes: {
+                    enabled: true,
+                    defer: true
+                }
+            }
         },
 
         dev: {
