@@ -48,9 +48,11 @@ export default function watchServer(compiler) {
         };
 
         const initBrowsersync = () => {
+            const basePath = getSettings('build').path;
             browserSync({
                 port: parseInt(getDevPort(), 10) + 1,
-                proxy: `0.0.0.0:${getPort()}`,
+                // This proxy will remove extra slashes from the path, important to note
+                proxy: `0.0.0.0:${getPort()}${basePath}`,
                 snippetOptions: {
                     rule: {
                         match: /<\/body>/i,

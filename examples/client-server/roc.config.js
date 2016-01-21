@@ -2,7 +2,7 @@ module.exports = {
     settings: {
         runtime: {
             port: 8080,
-            serve: 'files',
+            serve: ['files', 'build/client'],
             favicon: 'files/roc.png'
         },
         build: {

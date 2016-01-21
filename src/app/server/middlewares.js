@@ -1,5 +1,6 @@
-/* global __DIST__ */
+/* global __DEV__ __DIST__ */
 
+import koaErrors from 'koa-errors';
 import helmet from 'koa-helmet';
 import koaEtag from 'koa-etag';
 import koaCompressor from 'koa-compressor';
@@ -15,6 +16,10 @@ import koaLogger from 'koa-logger';
  */
 export default function middlewares(config) {
     const middlewaresList = [];
+
+    if (__DEV__) {
+        middlewaresList.push(koaErrors());
+    }
 
     // Security headers
     middlewaresList.push(helmet());

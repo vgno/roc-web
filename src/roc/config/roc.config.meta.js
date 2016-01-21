@@ -11,6 +11,11 @@ import {
 
 const configMeta = {
     settings: {
+        groups: {
+            runtime: {
+                koa: 'Settings for how Koa should handle paths'
+            }
+        },
         descriptions: {
             runtime: {
                 port: 'Port for the server to use',
@@ -20,7 +25,21 @@ const configMeta = {
                 },
                 serve: 'What folder the server should expose',
                 favicon: 'Path to the favicon file, specially handled on the server',
-                startBundle: 'Relative path to a bundle to start when calling "start", will not be needed in most cases'
+                startBundle: 'Relative path to a bundle to start when calling "start", is not needed in most cases',
+                koa: {
+                    lowercase: {
+                        enabled: 'If paths should be transformed to lowercase',
+                        defer: 'If this should be performed after looking for a file on disk'
+                    },
+                    normalize: {
+                        enabled: 'If paths should be normalized, that is remove extra slashes',
+                        defer: 'If this should be performed after looking for a file on disk'
+                    },
+                    trailingSlashes: {
+                        enabled: 'Set to true to enforce trailing slashes, false to remove them and null for no rule',
+                        defer: 'If this should be performed after looking for a file on disk'
+                    }
+                }
             },
 
             dev: {
@@ -74,7 +93,21 @@ const configMeta = {
                 },
                 serve: isArrayOrSingle(isPath),
                 favicon: isString,
-                startBundle: isPath
+                startBundle: isPath,
+                koa: {
+                    lowercase: {
+                        enabled: isBoolean,
+                        defer: isBoolean
+                    },
+                    normalize: {
+                        enabled: isBoolean,
+                        defer: isBoolean
+                    },
+                    trailingSlashes: {
+                        enabled: isBoolean,
+                        defer: isBoolean
+                    }
+                }
             },
 
             dev: {
