@@ -156,7 +156,7 @@ const configMeta = {
         'start': {
             settings: ['runtime'],
             description: 'Starts the current project.',
-            options: [{
+            arguments: [{
                 name: 'artifact',
                 validation: isPath
             }]
