@@ -34,7 +34,7 @@ export default function createServer(options = {}, beforeUserMiddlewares = []) {
     const settings = merge(getSettings('runtime'), options);
 
     if (USE_DEFAULT_KOA_MIDDLEWARES) {
-        const middlewares = require('./middlewares')(settings);
+        const middlewares = require('./middlewares').default(settings);
         middlewares.forEach((middleware) => server.use(middleware));
     }
 
@@ -43,7 +43,7 @@ export default function createServer(options = {}, beforeUserMiddlewares = []) {
     }
 
     if (HAS_KOA_MIDDLEWARES) {
-        const middlewares = require(KOA_MIDDLEWARES)(settings);
+        const middlewares = require(KOA_MIDDLEWARES).default(settings);
         middlewares.forEach((middleware) => server.use(middleware));
     }
 
@@ -84,7 +84,7 @@ export default function createServer(options = {}, beforeUserMiddlewares = []) {
             process.send('online');
         }
 
-        debug('roc:server')(`Server started on port ${port} and served from ${ROC_PATH}`);
+        debug('roc:server')('Server started on port ' + port + ' and served from ' + ROC_PATH);
     }
 
     return {
