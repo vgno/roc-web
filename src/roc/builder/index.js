@@ -188,6 +188,17 @@ export default function createBuilder(target, { buildConfig = {}, builder = requ
     const jsLoader = {
         test: /\.js$/,
         loader: 'babel-loader',
+        query: {
+            cacheDirectory: true,
+            presets: [
+                require.resolve('babel-preset-es2015'),
+                require.resolve('babel-preset-stage-1')
+            ],
+            plugins: [
+                require.resolve('babel-plugin-transform-runtime'),
+                require.resolve('babel-plugin-transform-decorators-legacy')
+            ]
+        },
         include: function(absPath) {
             /* This function will look at the absolute path for the current file
              * to determine if it should be processed by babel-loader.

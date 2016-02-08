@@ -1,6 +1,6 @@
 /* global ROC_PATH_RESOLVER ROC_SERVER_ENTRY */
 
-const getResolvePath = require(ROC_PATH_RESOLVER);
+const getResolvePath = require(ROC_PATH_RESOLVER).default;
 
 // Init NODE_PATH if not set
 if (!process.env.NODE_PATH) {

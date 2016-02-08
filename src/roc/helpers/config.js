@@ -5,11 +5,11 @@ import 'source-map-support/register';
  *
  * @returns {object} Returns the base configuration
  */
-export const baseConfig = require('../config/roc.config.js');
+export const baseConfig = require('../config/roc.config.js').default;
 
 /**
  * Gives the meta configuration.
  *
  * @returns {object} Returns the meta configuration
  */
-export const metaConfig = require('../config/roc.config.meta.js');
+export const metaConfig = require('../config/roc.config.meta.js').default;
