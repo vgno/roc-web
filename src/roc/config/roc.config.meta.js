@@ -18,7 +18,14 @@ const configMeta = {
         },
         descriptions: {
             runtime: {
-                port: 'Port for the server to use',
+                port: 'Port for the server to use for HTTP.',
+                https: {
+                    port: 'Port for the server to use for HTTPS. If none is defined it will not launch in HTTPS.',
+                    key: 'The key file to use when using HTTPS. If none is provided and if running in dev a file ' +
+                        'will be provided automatically.',
+                    cert: 'The certificate file to use when using HTTPS. If none is provided and if running in dev a ' +
+                        'file will be provided automatically.'
+                },
                 debug: {
                     server: 'Filter for debug messages that should be shown for the server, see ' +
                         'https://npmjs.com/package/debug'
@@ -88,6 +95,10 @@ const configMeta = {
         validations: {
             runtime: {
                 port: isInteger,
+                https: {
+                    key: isPath,
+                    cert: isPath
+                },
                 debug: {
                     server: isString
                 },

@@ -1,6 +1,9 @@
-/* global USE_DEFAULT_KOA_MIDDLEWARES HAS_KOA_MIDDLEWARES KOA_MIDDLEWARES ROC_PATH  */
+/* global USE_DEFAULT_KOA_MIDDLEWARES HAS_KOA_MIDDLEWARES KOA_MIDDLEWARES ROC_PATH __DEV__  */
 
+import { readFileSync } from 'fs';
 import debug from 'debug';
+import http from 'http';
+import https from 'https';
 import koa from 'koa';
 import serve from 'koa-static';
 import mount from 'koa-mount';
@@ -10,7 +13,7 @@ import normalizePath from 'koa-normalize-path';
 import lowercasePath from 'koa-lowercase-path';
 import removeTrailingSlash from 'koa-remove-trailing-slashes';
 
-import { merge, getSettings } from 'roc';
+import { merge, getSettings, getAbsolutePath } from 'roc';
 
 /**
  * Creates a server instance.
@@ -30,6 +33,8 @@ import { merge, getSettings } from 'roc';
  * @returns {rocServer} server - Roc server instace.
  */
 export default function createServer(options = {}, beforeUserMiddlewares = []) {
+    const logger = debug('roc:server');
+
     const server = koa();
     const settings = merge(getSettings('runtime'), options);
 
@@ -73,18 +78,44 @@ export default function createServer(options = {}, beforeUserMiddlewares = []) {
     // Serve folders
     makeServe(settings.serve);
 
-    function start(port) {
+    function start(port, httpsPort) {
         port = port || process.env.PORT || settings.port;
+        httpsPort = httpsPort || process.env.HTTPS_PORT || settings.https.port;
 
         const app = koa();
         app.use(mount(ROC_PATH, server));
-        app.listen(port);
+
+        // Start the server on HTTP
+        http.createServer(app.callback()).listen(port);
+        logger(`Server started on port ${port} (HTTP) and served from ${ROC_PATH}`);
+
+        // If a HTTPS port is defined we will try to start the application with SSL/TLS
+        if (httpsPort) {
+            let key = getAbsolutePath(settings.https.key);
+            let cert = getAbsolutePath(settings.https.cert);
+
+            // Add a self-signed certificate for development purposes if non is provided.
+            if (__DEV__ && !key && !cert) {
+                key = require('roc-web/certificate').getKey();
+                cert = require('roc-web/certificate').getCert();
+            }
+
+            if (key && cert) {
+                const httpsOptions = {
+                    key: readFileSync(key),
+                    cert: readFileSync(cert)
+                };
+
+                https.createServer(httpsOptions, app.callback()).listen(httpsPort);
+                logger(`Server started on port ${httpsPort} (HTTPS) and served from ${ROC_PATH}`);
+            } else {
+                logger('You have defined a HTTPS port but not given any certificate files to use…');
+            }
+        }
 
         if (process.send) {
             process.send('online');
         }
-
-        debug('roc:server')(`Server started on port ${port} and served from ${ROC_PATH}`);
     }
 
     return {

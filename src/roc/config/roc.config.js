@@ -13,6 +13,11 @@ const config = {
     settings: {
         runtime: {
             port: 3000,
+            https: {
+                port: '',
+                key: '',
+                cert: ''
+            },
             debug: {
                 server: 'roc:*'
             },
