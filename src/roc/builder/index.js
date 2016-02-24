@@ -250,7 +250,7 @@ export default function createBuilder(target, { buildConfig = {}, builder = requ
         }, []);
     };
 
-    const scssStyles = flattenAssetsStyles(settings.assets, /\.scss$/);
+    const scssStyles = flattenAssetsStyles(settings.assets, /\.scss$|\.css$/);
 
     // GLOBAL STYLE LOADER
     const globalStyleLoader = {
@@ -265,7 +265,7 @@ export default function createBuilder(target, { buildConfig = {}, builder = requ
     // STYLE LOADER
     const styleLoader = {
         test: (absPath) => {
-            if (scssStyles.indexOf(absPath) === -1 && /\.scss$/.test(absPath)) {
+            if (scssStyles.indexOf(absPath) === -1 && /\.scss$|\.css$/.test(absPath)) {
                 return true;
             }
         }
