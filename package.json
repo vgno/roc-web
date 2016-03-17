@@ -1,6 +1,6 @@
 {
   "name": "roc-web",
-  "version": "1.0.0-beta2",
+  "version": "1.0.0-beta5",
   "description": "Web base extension for Roc Applications",
   "main": "lib/index.js",
   "bin": "lib/bin/index.js",
